@@ -1,6 +1,6 @@
 {
   "name": "dotctx",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Universal, file-based, git-tracked AI context system for any model in any tool",
   "type": "module",
   "bin": {
