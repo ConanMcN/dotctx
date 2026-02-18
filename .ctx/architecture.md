@@ -13,11 +13,14 @@
 | `src/core/adapters/` | [D] Output adapters: claude, cursor, copilot, system |
 | `src/mcp/` | [D] MCP server (stdio transport), tools, resources, and prompts |
 | `src/templates/` | [D] Scaffold templates for `init` and the ctx-setup skill prompt |
-| `src/utils/` | [D] Helpers: git, markdown parsing, token counting, YAML I/O, autocompile |
+| `src/utils/` | [D] Helpers: git, markdown parsing, token counting, YAML I/O, autocompile, editor hooks |
 | `src/utils/autocompile.ts` | Auto-recompile all adapters after mutation commands |
+| `src/utils/claude-hooks.ts` | Install Claude Code UserPromptSubmit hook during init |
+| `src/utils/cursor-hooks.ts` | Install Cursor sessionStart hook during init |
 | `src/__tests__/` | [D] Vitest unit tests |
 | `.ctx/` | [D] The context directory this tool manages (also used on itself) |
 | `.claude/commands/` | [D] Claude Code slash command (ctx-setup.md skill) |
+| `.claude/hooks/` | Claude Code UserPromptSubmit hook (dotctx-preflight.sh) |
 | `.changeset/` | Changesets config for version management |
 
 ## Ripple map
@@ -37,6 +40,8 @@
 - `src/core/freshness.ts` → `src/commands/loop.ts`, `src/commands/status.ts`, `src/commands/prune.ts` [D]
 - `src/templates/index.ts` → `src/commands/init.ts` [D]
 - `src/templates/skill.ts` → `src/commands/skill.ts`, `src/templates/index.ts` [D]
+- `src/utils/claude-hooks.ts` → `src/commands/init.ts`
+- `src/utils/cursor-hooks.ts` → `src/commands/init.ts`
 
 ## Dependency flow
 <!-- [D] Derived from imports and architecture -->

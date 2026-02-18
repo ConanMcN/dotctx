@@ -16,6 +16,8 @@
 - Mutation commands: call `autoCompile(ctxDir)` after writing, support `--no-compile` flag to skip
 - MCP autocompile: use `autoCompile(ctxDir, { silent: true })` — never print to stdout in MCP context
 - CLI version: read dynamically from `package.json` via `createRequire` — never hardcode
+- Editor hook install: follows `installSkillDuringInit` pattern — returns `string | null`, idempotent, merge-safe with existing config
+- Hook scripts: try direct binary → `node_modules/.bin/` → `npx --yes` (speed optimization, graceful fallback)
 
 ## Anti-patterns
 <!-- [D] Inferred from codebase patterns -->
@@ -38,3 +40,5 @@
 - `loader.ts` parses markdown tables manually — don't replace with a markdown AST library unless requested [D]
 - Models may forget to add `autoCompile()` call when creating new mutation commands
 - Models may use `console.log` in autoCompile calls within MCP context — must use `{ silent: true }`
+- Models may install Cursor hooks unconditionally — must check for `.cursor/` directory first
+- Models may forget `exit 0` in hook scripts — hooks must never block the user

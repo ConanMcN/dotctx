@@ -18,3 +18,8 @@
 | Git hook uses `npx --yes` with `exit 0` | Direct binary path, husky | Works whether installed globally or locally; never blocks commits | 2026-02-18 |
 | MCP resources for passive context | Tools-only MCP | Resources let MCP clients auto-read context without explicit tool calls | 2026-02-18 |
 | Dynamic CLI version from package.json | Hardcoded version string | Prevents version drift between package.json and CLI --version output | 2026-02-18 |
+| Auto-install editor hooks during init | Manual hook setup, separate CLI command | Removes agent from the loop — context injected automatically via editor hooks | 2026-02-18 |
+| Claude Code hook runs preflight per-prompt | Session-start only, manual preflight | UserPromptSubmit fires every prompt — task-specific context always fresh | 2026-02-18 |
+| Cursor hook runs capsule at session start | Per-prompt hook | Cursor's beforeSubmitPrompt can't inject context; sessionStart can via additional_context JSON | 2026-02-18 |
+| Hook script tries binary → node_modules → npx | npx only, direct path only | Speed optimization — avoids npx overhead when binary is available locally | 2026-02-18 |
+| Cursor hooks only install if .cursor/ exists | Always install | Respects user's editor choice — don't create .cursor/ for non-Cursor users | 2026-02-18 |

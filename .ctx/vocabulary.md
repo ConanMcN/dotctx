@@ -19,3 +19,6 @@
 | hook (git hook) | A post-commit script that auto-runs `dotctx push --auto` and `dotctx compile --target all` — NOT a React hook |
 | resource (MCP) | A readable URI (ctx://context, ctx://current, ctx://landmines) exposed by the MCP server for passive context access |
 | prompt (MCP) | A named MCP prompt template (ctx_start_session) that combines capsule + preflight for session onboarding |
+| editor hook | A shell script installed into an editor's hook system (.claude/hooks/, .cursor/hooks/) that auto-injects dotctx context — NOT a React hook or git hook |
+| UserPromptSubmit | Claude Code hook event that fires on every user prompt — stdout is injected as context into the conversation |
+| sessionStart | Cursor hook event that fires when a new session begins — returns JSON with `additional_context` field |
