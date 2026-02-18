@@ -5,12 +5,14 @@ import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { writeYaml } from '../utils/yaml.js';
 import { isGitRepo, getGitBranch, getGitDiff, getRecentCommits } from '../utils/git.js';
+import { autoCompile } from '../utils/autocompile.js';
 
 export function registerPush(program: Command): void {
   program
     .command('push')
     .description('Record a session handoff note')
     .option('--auto', 'Auto-generate from git state')
+    .option('--no-compile', 'Skip auto-compile after recording')
     .action(async (opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
@@ -103,6 +105,10 @@ export function registerPush(program: Command): void {
       console.log(pc.green(`✓ Session note saved: ${sessionId}`));
       if (opts.auto) {
         console.log(`  Files touched: ${filesTouched.length}`);
+      }
+
+      if (opts.compile !== false) {
+        autoCompile(ctxDir);
       }
     });
 }

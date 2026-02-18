@@ -130,5 +130,19 @@ export function registerInit(program: Command): void {
       }
 
       console.log(`  Next: Run ${pc.cyan('/ctx-setup')} in Claude Code, or edit ${pc.cyan('.ctx/stack.yaml')} manually.`);
+
+      // Suggest dev dependency if package.json exists
+      const pkgPath = path.join(cwd, 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        try {
+          const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+          const devDeps = pkg.devDependencies || {};
+          if (!devDeps['dotctx']) {
+            console.log('');
+            console.log(`  ${pc.blue('Tip:')} Add dotctx as a dev dependency for your team:`);
+            console.log(`    ${pc.cyan('npm install --save-dev dotctx')}`);
+          }
+        } catch { /* ignore parse errors */ }
+      }
     });
 }

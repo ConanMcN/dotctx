@@ -4,6 +4,7 @@ import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { writeYaml } from '../utils/yaml.js';
 import { parseDuration, isStale, getExpiredLoops, getExpiringLoops } from '../core/freshness.js';
+import { autoCompile } from '../utils/autocompile.js';
 import type { OpenLoop } from '../types.js';
 
 export function registerLoop(program: Command): void {
@@ -17,6 +18,7 @@ export function registerLoop(program: Command): void {
     .argument('<description>', 'What needs to be done')
     .option('--ttl <duration>', 'Time-to-live (e.g., 7d, 48h)', '14d')
     .option('--context <text>', 'Additional context')
+    .option('--no-compile', 'Skip auto-compile after recording')
     .action((description, opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
@@ -39,13 +41,18 @@ export function registerLoop(program: Command): void {
       writeYaml(path.join(ctxDir, 'open-loops.yaml'), { loops });
 
       console.log(pc.green(`✓ Loop #${newLoop.id} added: ${description}`));
+
+      if (opts.compile !== false) {
+        autoCompile(ctxDir);
+      }
     });
 
   loop
     .command('resolve')
     .description('Mark a loop as resolved')
     .argument('<id>', 'Loop ID')
-    .action((id) => {
+    .option('--no-compile', 'Skip auto-compile after recording')
+    .action((id, opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
         console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
@@ -63,6 +70,10 @@ export function registerLoop(program: Command): void {
       writeYaml(path.join(ctxDir, 'open-loops.yaml'), { loops: ctx.openLoops });
 
       console.log(pc.green(`✓ Loop #${id} resolved: ${loop.description}`));
+
+      if (opts.compile !== false) {
+        autoCompile(ctxDir);
+      }
     });
 
   loop

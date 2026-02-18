@@ -5,12 +5,14 @@ import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { writeYaml } from '../utils/yaml.js';
 import { getExpiredLoops } from '../core/freshness.js';
+import { autoCompile } from '../utils/autocompile.js';
 
 export function registerPrune(program: Command): void {
   program
     .command('prune')
     .description('Remove expired items and old sessions')
     .option('--dry-run', 'Show what would be removed without removing')
+    .option('--no-compile', 'Skip auto-compile after pruning')
     .action((opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
@@ -65,6 +67,9 @@ export function registerPrune(program: Command): void {
         console.log(pc.dim('\n  (dry run — nothing removed)'));
       } else if (pruned) {
         console.log(pc.green(`\n  ✓ Pruned ${pruned} item(s)`));
+        if (opts.compile !== false) {
+          autoCompile(ctxDir);
+        }
       } else {
         console.log(pc.dim('  Nothing to prune.'));
       }

@@ -4,6 +4,7 @@ import { generatePreflight } from '../core/preflight.js';
 import type { CtxData } from '../types.js';
 import { writeYaml } from '../utils/yaml.js';
 import { appendToFile } from '../utils/markdown.js';
+import { autoCompile } from '../utils/autocompile.js';
 import path from 'node:path';
 import fs from 'node:fs';
 
@@ -98,6 +99,7 @@ export function createTools(ctxDir: string): ToolDefinition[] {
           });
         }
 
+        autoCompile(ctxDir, { silent: true });
         return textResult(`Session note saved: ${sessionId}`);
       },
     },
@@ -117,6 +119,7 @@ export function createTools(ctxDir: string): ToolDefinition[] {
         const date = new Date().toISOString().split('T')[0];
         const row = `| ${args.decision} | ${(args.rejected as string) || ''} | ${args.why} | ${date} |`;
         appendToFile(path.join(ctxDir, 'decisions.md'), row);
+        autoCompile(ctxDir, { silent: true });
         return textResult(`Decision recorded: ${args.decision}`);
       },
     },
@@ -136,6 +139,7 @@ export function createTools(ctxDir: string): ToolDefinition[] {
         const date = new Date().toISOString().split('T')[0];
         const row = `| ${args.description} | ${(args.file as string) || ''} | ${(args.why as string) || ''} | ${date} |`;
         appendToFile(path.join(ctxDir, 'landmines.md'), row);
+        autoCompile(ctxDir, { silent: true });
         return textResult(`Landmine marked: ${args.description}`);
       },
     },

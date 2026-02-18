@@ -13,6 +13,7 @@ import { registerStatus } from './commands/status.js';
 import { registerPrune } from './commands/prune.js';
 import { registerServe } from './commands/serve.js';
 import { registerSkill } from './commands/skill.js';
+import { registerHooks } from './commands/hooks.js';
 
 const program = new Command();
 
@@ -34,5 +35,6 @@ registerStatus(program);
 registerPrune(program);
 registerServe(program);
 registerSkill(program);
+registerHooks(program);
 
 program.parse();
