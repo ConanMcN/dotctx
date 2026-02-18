@@ -1,3 +1,5 @@
+export { CTX_SETUP_SKILL } from './skill.js';
+
 export const TEMPLATES: Record<string, { filename: string; content: string }> = {
   stack: {
     filename: 'stack.yaml',

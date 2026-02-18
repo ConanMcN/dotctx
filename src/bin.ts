@@ -12,13 +12,14 @@ import { registerLoop } from './commands/loop.js';
 import { registerStatus } from './commands/status.js';
 import { registerPrune } from './commands/prune.js';
 import { registerServe } from './commands/serve.js';
+import { registerSkill } from './commands/skill.js';
 
 const program = new Command();
 
 program
   .name('dotctx')
   .description('Universal AI context management — file-based, git-tracked, model-agnostic')
-  .version('0.1.0');
+  .version('0.1.1');
 
 registerInit(program);
 registerPull(program);
@@ -32,5 +33,6 @@ registerLoop(program);
 registerStatus(program);
 registerPrune(program);
 registerServe(program);
+registerSkill(program);
 
 program.parse();

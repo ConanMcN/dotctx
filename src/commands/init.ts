@@ -4,6 +4,7 @@ import path from 'node:path';
 import pc from 'picocolors';
 import { TEMPLATES } from '../templates/index.js';
 import { findCtxDir } from '../core/loader.js';
+import { installSkillDuringInit } from './skill.js';
 
 function detectStack(projectDir: string): { language: string[]; framework: string[]; build: string[]; test: string[] } {
   const result = { language: [] as string[], framework: [] as string[], build: [] as string[], test: [] as string[] };
@@ -120,6 +121,14 @@ export function registerInit(program: Command): void {
         }
       }
 
-      console.log(`  Next: Edit ${pc.cyan('.ctx/stack.yaml')} and ${pc.cyan('.ctx/conventions.md')} to add project context.`);
+      // Install the ctx-setup skill as a Claude Code slash command
+      const skillPath = installSkillDuringInit(cwd);
+      if (skillPath) {
+        console.log(`  ${pc.green('✓')} Skill installed: ${pc.dim('.claude/commands/')}ctx-setup.md`);
+        console.log(`    Use ${pc.cyan('/ctx-setup')} in Claude Code to auto-populate .ctx/ files.`);
+        console.log('');
+      }
+
+      console.log(`  Next: Run ${pc.cyan('/ctx-setup')} in Claude Code, or edit ${pc.cyan('.ctx/stack.yaml')} manually.`);
     });
 }
