@@ -1,0 +1,21 @@
+# Current work-in-progress
+branch: "main"
+task: "Workflow improvements — auto-compile, git hooks, MCP resources/prompts"
+state: "done"
+next_step: "Add more adapters, improve token counting accuracy, add tests for new features"
+blocked_by: ""
+files_touched:
+  - src/utils/autocompile.ts
+  - src/commands/hooks.ts
+  - src/bin.ts
+  - src/commands/decide.ts
+  - src/commands/landmine.ts
+  - src/commands/vocab.ts
+  - src/commands/loop.ts
+  - src/commands/push.ts
+  - src/commands/prune.ts
+  - src/commands/init.ts
+  - src/mcp/server.ts
+  - src/mcp/tools.ts
+  - README.md
+updated_at: "2026-02-18"

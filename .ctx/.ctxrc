@@ -1,0 +1,36 @@
+version: 1
+
+budget:
+  default: 2000
+  adapters:
+    claude: 3000
+    cursor: 2000
+    copilot: 1500
+
+allocation: priority
+priority_order:
+  - current
+  - landmines
+  - decisions
+  - ripple_map
+  - open_loops
+  - conventions
+  - architecture
+  - vocabulary
+  - session_log
+
+freshness:
+  stale_threshold: 48h
+  loop_default_ttl: 14d
+  max_sessions: 5
+
+adapters:
+  claude:
+    output: CLAUDE.md
+    include_bootstrap: true
+  cursor:
+    output: .cursorrules
+    include_bootstrap: true
+  copilot:
+    output: .github/copilot-instructions.md
+    include_bootstrap: true

@@ -1,0 +1,10 @@
+# Open threads — things started but not finished
+# Each loop has a TTL (time-to-live) after which it's flagged for review
+loops: []
+# Example:
+# - id: 1
+#   description: "Need to add error handling to auth flow"
+#   created_at: "2026-02-18"
+#   ttl: "14d"
+#   status: open
+#   context: "Started during login refactor"

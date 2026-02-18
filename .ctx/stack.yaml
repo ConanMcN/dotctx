@@ -1,0 +1,12 @@
+# Project stack — tech, tooling, environments
+name: "dotctx" # [D]
+language:
+  - "TypeScript 5.7" # [D]
+framework: [] # [D] No framework — this is a standalone CLI tool
+build:
+  - "tsup 8.4" # [D]
+test:
+  - "Vitest 3.0" # [D]
+deploy: "npm (public registry)" # [D]
+notes: "CLI tool + MCP server + library. Dual bin: `dotctx` and `aictx`. ESM-only." # [D]
+updated_at: "2026-02-18"
