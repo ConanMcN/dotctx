@@ -36,10 +36,12 @@ function hasExistingHook(settingsPath: string): boolean {
   if (!fs.existsSync(settingsPath)) return false;
   try {
     const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-    const hooks = settings?.hooks?.UserPromptSubmit;
-    if (!Array.isArray(hooks)) return false;
-    return hooks.some((h: { command?: string }) =>
-      typeof h.command === 'string' && h.command.includes('dotctx-preflight')
+    const matcherGroups = settings?.hooks?.UserPromptSubmit;
+    if (!Array.isArray(matcherGroups)) return false;
+    return matcherGroups.some((group: { hooks?: { command?: string }[] }) =>
+      Array.isArray(group.hooks) && group.hooks.some(
+        (h) => typeof h.command === 'string' && h.command.includes('dotctx-preflight')
+      )
     );
   } catch {
     return false;
@@ -61,15 +63,19 @@ function installSettings(cwd: string, hookPath: string): void {
   if (hasExistingHook(settingsPath)) return;
 
   const hooks = (settings.hooks ?? {}) as Record<string, unknown[]>;
-  const userPromptHooks = Array.isArray(hooks.UserPromptSubmit) ? hooks.UserPromptSubmit : [];
+  const matcherGroups = Array.isArray(hooks.UserPromptSubmit) ? hooks.UserPromptSubmit : [];
 
-  userPromptHooks.push({
-    type: 'command',
-    command: hookPath,
-    timeout: 10000,
+  matcherGroups.push({
+    hooks: [
+      {
+        type: 'command',
+        command: hookPath,
+        timeout: 10000,
+      },
+    ],
   });
 
-  hooks.UserPromptSubmit = userPromptHooks;
+  hooks.UserPromptSubmit = matcherGroups;
   settings.hooks = hooks;
 
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf-8');
