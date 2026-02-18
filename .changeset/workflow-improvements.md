@@ -2,11 +2,8 @@
 "dotctx": patch
 ---
 
-Update .ctx/ context files and compiled outputs to reflect v0.2.0 features
+Fix bootstrap instructions: rename aictx to dotctx, make proactive
 
-- Updated architecture.md with autocompile.ts, hooks.ts, mutation flow diagram
-- Added new decisions: auto-compile, git hooks, MCP resources, dynamic version
-- Added new landmines: autoCompile silent mode in MCP
-- Added new vocabulary: autocompile, hook, resource (MCP), prompt (MCP)
-- Updated conventions with autocompile patterns and AI failure modes
-- Recompiled CLAUDE.md, .cursorrules, copilot-instructions.md
+- All adapter bootstrap sections now reference `dotctx` instead of `aictx`
+- Bootstrap instructs AI to run `dotctx preflight` before starting tasks (proactive, not passive)
+- Updated .ctx/ context files to reflect v0.2.x features

@@ -35,7 +35,7 @@ describe('Claude adapter', () => {
 
   it('includes bootstrap instruction', () => {
     const output = compileForClaude(makeCtx());
-    expect(output).toContain('aictx pull');
+    expect(output).toContain('dotctx preflight');
     expect(output).toContain('.ctx/');
   });
 
@@ -55,7 +55,7 @@ describe('Cursor adapter', () => {
 
   it('includes bootstrap', () => {
     const output = compileForCursor(makeCtx());
-    expect(output).toContain('aictx pull');
+    expect(output).toContain('dotctx preflight');
   });
 });
 

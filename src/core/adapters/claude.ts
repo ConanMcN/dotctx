@@ -6,10 +6,12 @@ const BOOTSTRAP = `
 
 This project uses \`.ctx/\` for structured AI context management.
 
-To get task-specific context, run: \`aictx pull --task "your task description"\`
-To see what to watch out for: \`aictx preflight --task "your task description"\`
-To record a decision: \`aictx decide "choice" --over "alternatives" --why "reasoning"\`
-To mark intentional weirdness: \`aictx landmine "description" --file path:line\`
+**Before starting any coding task**, run: \`dotctx preflight --task "your task description"\`
+This checks for landmines, constraining decisions, and ripple effects relevant to your task.
+
+For full task-specific context: \`dotctx pull --task "your task description"\`
+To record a decision: \`dotctx decide "choice" --over "alternatives" --why "reasoning"\`
+To mark intentional weirdness: \`dotctx landmine "description" --file path:line\`
 
 Always check landmines before modifying code that looks wrong — it may be intentional.
 `.trim();

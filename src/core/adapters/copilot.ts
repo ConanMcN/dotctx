@@ -3,7 +3,9 @@ import type { CtxData } from '../../types.js';
 
 const BOOTSTRAP = `
 ## AI Context
-This project uses \`.ctx/\` for structured context. Run \`aictx pull --task "..."\` for task-specific context.
+This project uses \`.ctx/\` for structured context.
+**Before starting any coding task**, run: \`dotctx preflight --task "..."\` to check for landmines and constraints.
+For full context: \`dotctx pull --task "..."\`
 Check \`.ctx/landmines.md\` before changing code that looks wrong.
 `.trim();
 

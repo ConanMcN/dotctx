@@ -83,5 +83,7 @@ Files: src/utils/autocompile.ts, src/commands/hooks.ts, src/bin.ts, src/commands
 [...truncated to fit budget]
 
 # AI Context
-This project uses .ctx/ for structured context. Run `aictx pull --task "..."` for task-specific context.
+This project uses .ctx/ for structured context.
+**Before starting any coding task**, run: `dotctx preflight --task "..."` to check for landmines and constraints.
+For full context: `dotctx pull --task "..."`
 Check .ctx/landmines.md before changing code that looks wrong.
