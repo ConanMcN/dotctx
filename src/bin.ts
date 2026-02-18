@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import { createRequire } from 'node:module';
 import { registerInit } from './commands/init.js';
 import { registerPull } from './commands/pull.js';
 import { registerPreflight } from './commands/preflight.js';
@@ -15,12 +16,15 @@ import { registerServe } from './commands/serve.js';
 import { registerSkill } from './commands/skill.js';
 import { registerHooks } from './commands/hooks.js';
 
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json');
+
 const program = new Command();
 
 program
   .name('dotctx')
   .description('Universal AI context management — file-based, git-tracked, model-agnostic')
-  .version('0.1.1');
+  .version(version);
 
 registerInit(program);
 registerPull(program);
