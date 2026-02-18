@@ -16,7 +16,7 @@ import { registerServe } from './commands/serve.js';
 const program = new Command();
 
 program
-  .name('aictx')
+  .name('dotctx')
   .description('Universal AI context management — file-based, git-tracked, model-agnostic')
   .version('0.1.0');
 

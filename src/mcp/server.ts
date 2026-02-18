@@ -12,7 +12,7 @@ export async function startMcpServer(): Promise<void> {
   const tools = createTools(ctxDir);
 
   const server = new Server(
-    { name: 'aictx', version: '0.1.0' },
+    { name: 'dotctx', version: '0.1.0' },
     { capabilities: { tools: {} } }
   );
 

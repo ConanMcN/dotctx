@@ -1,10 +1,11 @@
 {
-  "name": "aictx",
+  "name": "dotctx",
   "version": "0.1.0",
   "description": "Universal, file-based, git-tracked AI context system for any model in any tool",
   "type": "module",
   "bin": {
-    "aictx": "./dist/bin.js"
+    "dotctx": "dist/bin.js",
+    "aictx": "dist/bin.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
