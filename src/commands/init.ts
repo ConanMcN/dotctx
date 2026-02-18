@@ -5,6 +5,8 @@ import pc from 'picocolors';
 import { TEMPLATES } from '../templates/index.js';
 import { findCtxDir } from '../core/loader.js';
 import { installSkillDuringInit } from './skill.js';
+import { installClaudeHookDuringInit } from '../utils/claude-hooks.js';
+import { installCursorHookDuringInit } from '../utils/cursor-hooks.js';
 
 function detectStack(projectDir: string): { language: string[]; framework: string[]; build: string[]; test: string[] } {
   const result = { language: [] as string[], framework: [] as string[], build: [] as string[], test: [] as string[] };
@@ -127,6 +129,24 @@ export function registerInit(program: Command): void {
         console.log(`  ${pc.green('✓')} Skill installed: ${pc.dim('.claude/commands/')}ctx-setup.md`);
         console.log(`    Use ${pc.cyan('/ctx-setup')} in Claude Code to auto-populate .ctx/ files.`);
         console.log('');
+      }
+
+      // Install Claude Code hook (always — .claude/ already exists from skill install)
+      const claudeHookPath = installClaudeHookDuringInit(cwd);
+      if (claudeHookPath) {
+        console.log(`  ${pc.green('✓')} Claude Code hook: ${pc.dim('.claude/hooks/')}dotctx-preflight.sh`);
+        console.log(`    Preflight runs automatically on every prompt.`);
+        console.log('');
+      }
+
+      // Install Cursor hook (only if .cursor/ already exists)
+      if (fs.existsSync(path.join(cwd, '.cursor'))) {
+        const cursorHookPath = installCursorHookDuringInit(cwd);
+        if (cursorHookPath) {
+          console.log(`  ${pc.green('✓')} Cursor hook: ${pc.dim('.cursor/hooks/')}dotctx-session-start.sh`);
+          console.log(`    Context capsule injected at session start.`);
+          console.log('');
+        }
       }
 
       console.log(`  Next: Run ${pc.cyan('/ctx-setup')} in Claude Code, or edit ${pc.cyan('.ctx/stack.yaml')} manually.`);
