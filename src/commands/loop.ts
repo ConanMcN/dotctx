@@ -5,6 +5,7 @@ import { loadContext, findCtxDir } from '../core/loader.js';
 import { writeYaml } from '../utils/yaml.js';
 import { parseDuration, isStale, getExpiredLoops, getExpiringLoops } from '../core/freshness.js';
 import { autoCompile } from '../utils/autocompile.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 import type { OpenLoop } from '../types.js';
 
 export function registerLoop(program: Command): void {
@@ -22,7 +23,7 @@ export function registerLoop(program: Command): void {
     .action((description, opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 
@@ -55,7 +56,7 @@ export function registerLoop(program: Command): void {
     .action((id, opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 
@@ -83,7 +84,7 @@ export function registerLoop(program: Command): void {
     .action((opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 

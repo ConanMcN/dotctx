@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { generatePreflight } from '../core/preflight.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerPreflight(program: Command): void {
   program
@@ -11,7 +12,7 @@ export function registerPreflight(program: Command): void {
     .action((opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 

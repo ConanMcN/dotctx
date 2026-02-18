@@ -4,6 +4,7 @@ import path from 'node:path';
 import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { getAdapter, getAllAdapters } from '../core/adapters/index.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerCompile(program: Command): void {
   program
@@ -14,7 +15,7 @@ export function registerCompile(program: Command): void {
     .action((opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 

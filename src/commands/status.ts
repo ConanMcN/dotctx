@@ -5,6 +5,7 @@ import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { countTokens } from '../utils/tokens.js';
 import { isStale, getExpiredLoops, getExpiringLoops } from '../core/freshness.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerStatus(program: Command): void {
   program
@@ -13,7 +14,7 @@ export function registerStatus(program: Command): void {
     .action(() => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 

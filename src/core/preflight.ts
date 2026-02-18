@@ -1,4 +1,5 @@
 import type { CtxData, PreflightChecklist, Decision, Landmine, OpenLoop } from '../types.js';
+import { CLI_NAME } from '../constants.js';
 
 function extractKeywords(text: string): string[] {
   return text
@@ -105,7 +106,7 @@ export function generatePreflight(ctx: CtxData, task: string): PreflightChecklis
   }
 
   lines.push('---');
-  lines.push('Run `aictx pull --task "..." ` for full context capsule.');
+  lines.push(`Run \`${CLI_NAME} pull --task "..." \` for full context capsule.`);
 
   return {
     landmines,

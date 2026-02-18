@@ -6,6 +6,7 @@ import { loadContext, findCtxDir } from '../core/loader.js';
 import { writeYaml } from '../utils/yaml.js';
 import { getExpiredLoops } from '../core/freshness.js';
 import { autoCompile } from '../utils/autocompile.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerPrune(program: Command): void {
   program
@@ -16,7 +17,7 @@ export function registerPrune(program: Command): void {
     .action((opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 

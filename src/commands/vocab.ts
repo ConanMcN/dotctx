@@ -4,6 +4,7 @@ import pc from 'picocolors';
 import { findCtxDir } from '../core/loader.js';
 import { appendToFile } from '../utils/markdown.js';
 import { autoCompile } from '../utils/autocompile.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerVocab(program: Command): void {
   program
@@ -13,7 +14,7 @@ export function registerVocab(program: Command): void {
     .action((term, definition, opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 

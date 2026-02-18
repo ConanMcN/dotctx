@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
 import { findCtxDir } from '../core/loader.js';
+import { NO_CTX_DIR_MSG } from '../constants.js';
 
 const HOOK_MARKER = '# dotctx: auto-update context after commit';
 
@@ -36,7 +37,7 @@ export function registerHooks(program: Command): void {
     .action(() => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red('No .ctx/ directory found. Run `aictx init` first.'));
+        console.log(pc.red(NO_CTX_DIR_MSG));
         process.exit(1);
       }
 
