@@ -29,6 +29,14 @@ export function getRecentCommits(n: number = 5): string[] {
   return output ? output.split('\n') : [];
 }
 
+export function getGitFilesChanged(): string[] {
+  const output = exec('git status --porcelain');
+  if (!output) return [];
+  return output.split('\n')
+    .map(line => line.slice(3).trim())
+    .filter(Boolean);
+}
+
 export function getGitRoot(): string {
   return exec('git rev-parse --show-toplevel');
 }

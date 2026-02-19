@@ -104,7 +104,7 @@ loops: []
 budget:
   default: 2000
   adapters:
-    claude: 3000
+    claude: 4000
     cursor: 2000
     copilot: 1500
 

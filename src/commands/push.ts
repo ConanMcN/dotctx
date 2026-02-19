@@ -4,7 +4,7 @@ import path from 'node:path';
 import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { writeYaml } from '../utils/yaml.js';
-import { isGitRepo, getGitBranch, getGitDiff, getRecentCommits } from '../utils/git.js';
+import { isGitRepo, getGitBranch, getGitDiff, getGitFilesChanged, getRecentCommits } from '../utils/git.js';
 import { autoCompile } from '../utils/autocompile.js';
 import { NO_CTX_DIR_MSG } from '../constants.js';
 
@@ -13,12 +13,29 @@ export function registerPush(program: Command): void {
     .command('push')
     .description('Record a session handoff note')
     .option('--auto', 'Auto-generate from git state')
+    .option('--sync', 'Lightweight current.yaml update (silent, no session note)')
     .option('--no-compile', 'Skip auto-compile after recording')
     .action(async (opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
-        console.log(pc.red(NO_CTX_DIR_MSG));
-        process.exit(1);
+        if (!opts.sync) console.log(pc.red(NO_CTX_DIR_MSG));
+        process.exit(opts.sync ? 0 : 1);
+      }
+
+      // --sync: lightweight current.yaml update only
+      if (opts.sync) {
+        const ctx = loadContext(ctxDir);
+        const currentPath = path.join(ctxDir, 'current.yaml');
+        writeYaml(currentPath, {
+          branch: isGitRepo() ? getGitBranch() : ctx.current?.branch || '',
+          task: ctx.current?.task || '',
+          state: ctx.current?.state || '',
+          next_step: ctx.current?.next_step || '',
+          blocked_by: ctx.current?.blocked_by || '',
+          files_touched: isGitRepo() ? getGitFilesChanged() : ctx.current?.files_touched || [],
+          updated_at: new Date().toISOString().split('T')[0],
+        });
+        return;
       }
 
       const ctx = loadContext(ctxDir);

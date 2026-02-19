@@ -15,6 +15,8 @@ import { registerPrune } from './commands/prune.js';
 import { registerServe } from './commands/serve.js';
 import { registerSkill } from './commands/skill.js';
 import { registerHooks } from './commands/hooks.js';
+import { registerUpgrade } from './commands/upgrade.js';
+import { registerCheck } from './commands/check.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json');
@@ -40,5 +42,7 @@ registerPrune(program);
 registerServe(program);
 registerSkill(program);
 registerHooks(program);
+registerUpgrade(program);
+registerCheck(program);
 
 program.parse();

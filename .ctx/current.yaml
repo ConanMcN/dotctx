@@ -1,11 +1,26 @@
-# Current work-in-progress
-branch: "main"
-task: "Auto-install editor hooks during dotctx init"
-state: "done"
-next_step: "Add more adapters, improve token counting accuracy, add tests for new features"
-blocked_by: ""
+branch: main
+task: Auto-install editor hooks during dotctx init
+state: in-progress
+next_step: ''
+blocked_by: ''
 files_touched:
+  - ctx/.ctxrc
+  - .ctx/current.yaml
+  - .cursorrules
+  - .github/copilot-instructions.md
+  - CLAUDE.md
+  - src/bin.ts
+  - src/commands/init.ts
+  - src/commands/push.ts
+  - src/core/preflight.ts
+  - src/templates/index.ts
   - src/utils/claude-hooks.ts
   - src/utils/cursor-hooks.ts
-  - src/commands/init.ts
-updated_at: "2026-02-18"
+  - src/utils/git.ts
+  - .claude/hooks/
+  - .claude/settings.json
+  - .ctx/sessions/
+  - .github/workflows/
+  - src/commands/check.ts
+  - src/commands/upgrade.ts
+updated_at: '2026-02-19'

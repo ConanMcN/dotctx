@@ -94,3 +94,27 @@ export function installCursorHookDuringInit(cwd: string): string | null {
     return null;
   }
 }
+
+export function upgradeCursorHooks(cwd: string): string[] {
+  // Only run if .cursor/ exists
+  if (!fs.existsSync(path.join(cwd, '.cursor'))) return [];
+
+  const changes: string[] = [];
+  const hooksDir = getHooksDir(cwd);
+  const hookPath = path.join(hooksDir, HOOK_FILENAME);
+  const configPath = path.join(cwd, '.cursor', 'hooks.json');
+
+  fs.mkdirSync(hooksDir, { recursive: true });
+
+  // Always overwrite hook script to latest
+  fs.writeFileSync(hookPath, HOOK_SCRIPT, { mode: 0o755 });
+  changes.push(`Updated ${HOOK_FILENAME}`);
+
+  // Add missing config registration
+  if (!hasExistingHook(configPath)) {
+    installConfig(cwd, hookPath);
+    changes.push('Registered sessionStart hook in hooks.json');
+  }
+
+  return changes;
+}

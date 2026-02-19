@@ -1,12 +1,10 @@
 version: 1
-
 budget:
   default: 2000
   adapters:
-    claude: 3000
+    claude: 4000
     cursor: 2000
     copilot: 1500
-
 allocation: priority
 priority_order:
   - current
@@ -18,12 +16,10 @@ priority_order:
   - architecture
   - vocabulary
   - session_log
-
 freshness:
   stale_threshold: 48h
   loop_default_ttl: 14d
   max_sessions: 5
-
 adapters:
   claude:
     output: CLAUDE.md

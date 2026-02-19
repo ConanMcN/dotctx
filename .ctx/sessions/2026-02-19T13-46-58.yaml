@@ -1,0 +1,12 @@
+id: 2026-02-19T13-46-58
+date: '2026-02-19'
+summary: 'Commits: a45fefb fix: use new Claude Code hooks format with nested matcher groups; cf8aa73 chore: bump to 0.2.5; 776688c docs: add editor hooks section to README'
+state: in-progress
+next_step: ''
+files_touched:
+  - .ctx/.ctxrc
+  - src/bin.ts
+  - src/commands/init.ts
+  - src/templates/index.ts
+  - src/utils/claude-hooks.ts
+  - src/utils/cursor-hooks.ts

@@ -1,0 +1,60 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/conanmcnicholl/personal-projects/aictx/.claude/hooks/dotctx-preflight.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/conanmcnicholl/personal-projects/aictx/.claude/hooks/dotctx-post-commit.sh",
+            "timeout": 15000
+          }
+        ],
+        "matcher": "Bash"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/conanmcnicholl/personal-projects/aictx/.claude/hooks/dotctx-ripple-check.sh",
+            "timeout": 5000
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/conanmcnicholl/personal-projects/aictx/.claude/hooks/dotctx-session-sync.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/conanmcnicholl/personal-projects/aictx/.claude/hooks/dotctx-landmine-guard.sh",
+            "timeout": 5000
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
+    ]
+  }
+}

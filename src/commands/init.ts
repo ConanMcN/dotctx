@@ -5,7 +5,13 @@ import pc from 'picocolors';
 import { TEMPLATES } from '../templates/index.js';
 import { findCtxDir } from '../core/loader.js';
 import { installSkillDuringInit } from './skill.js';
-import { installClaudeHookDuringInit } from '../utils/claude-hooks.js';
+import {
+  installClaudeHookDuringInit,
+  installClaudePostCommitHook,
+  installClaudeSessionSyncHook,
+  installClaudeLandmineGuardHook,
+  installClaudeRippleCheckHook,
+} from '../utils/claude-hooks.js';
 import { installCursorHookDuringInit } from '../utils/cursor-hooks.js';
 
 function detectStack(projectDir: string): { language: string[]; framework: string[]; build: string[]; test: string[] } {
@@ -131,11 +137,39 @@ export function registerInit(program: Command): void {
         console.log('');
       }
 
-      // Install Claude Code hook (always — .claude/ already exists from skill install)
+      // Install Claude Code hooks (always — .claude/ already exists from skill install)
       const claudeHookPath = installClaudeHookDuringInit(cwd);
       if (claudeHookPath) {
         console.log(`  ${pc.green('✓')} Claude Code hook: ${pc.dim('.claude/hooks/')}dotctx-preflight.sh`);
         console.log(`    Preflight runs automatically on every prompt.`);
+        console.log('');
+      }
+
+      const postCommitHookPath = installClaudePostCommitHook(cwd);
+      if (postCommitHookPath) {
+        console.log(`  ${pc.green('✓')} Claude Code hook: ${pc.dim('.claude/hooks/')}dotctx-post-commit.sh`);
+        console.log(`    Auto-pushes context after git commit.`);
+        console.log('');
+      }
+
+      const sessionSyncHookPath = installClaudeSessionSyncHook(cwd);
+      if (sessionSyncHookPath) {
+        console.log(`  ${pc.green('✓')} Claude Code hook: ${pc.dim('.claude/hooks/')}dotctx-session-sync.sh`);
+        console.log(`    Syncs current.yaml when Claude finishes responding.`);
+        console.log('');
+      }
+
+      const landmineGuardHookPath = installClaudeLandmineGuardHook(cwd);
+      if (landmineGuardHookPath) {
+        console.log(`  ${pc.green('✓')} Claude Code hook: ${pc.dim('.claude/hooks/')}dotctx-landmine-guard.sh`);
+        console.log(`    Warns about landmines before file edits.`);
+        console.log('');
+      }
+
+      const rippleCheckHookPath = installClaudeRippleCheckHook(cwd);
+      if (rippleCheckHookPath) {
+        console.log(`  ${pc.green('✓')} Claude Code hook: ${pc.dim('.claude/hooks/')}dotctx-ripple-check.sh`);
+        console.log(`    Shows ripple effects after file edits.`);
         console.log('');
       }
 
