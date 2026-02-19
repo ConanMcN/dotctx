@@ -1,4 +1,4 @@
-export { CTX_SETUP_SKILL, CTX_WORK_SKILL } from './skill.js';
+export { CTX_SETUP_SKILL, CTX_WORK_SKILL, CTX_REFRESH_SKILL } from './skill.js';
 
 export const TEMPLATES: Record<string, { filename: string; content: string }> = {
   stack: {

@@ -30,6 +30,9 @@ dotctx decide "Use JWT" --over "sessions,cookies" --why "stateless, scales horiz
 # Mark intentional weirdness
 dotctx landmine "Legacy enum values — do NOT renumber" --file src/types.ts:42
 
+# Check context freshness
+dotctx audit
+
 # Session handoff
 dotctx push --auto
 
@@ -45,8 +48,9 @@ The typical development loop with dotctx:
 2. **Populate** — Run `/ctx-setup` in Claude Code (or edit `.ctx/` files manually) to fill in your project context
 3. **Code** — Use `/ctx-work <task>` for context-aware development with automatic triage, planning, and verification
 4. **Iterate** — Mutation commands (`decide`, `landmine`, `vocab`, `loop add`, `push`) auto-compile after each change
-5. **Handoff** — `dotctx push --auto` records session state from git for the next session
-6. **Resume** — `dotctx pull --task "..."` generates a task-specific capsule to onboard the next session
+5. **Maintain** — `dotctx audit` flags stale context; `/ctx-refresh` guides updates
+6. **Handoff** — `dotctx push --auto` records session state from git for the next session
+7. **Resume** — `dotctx pull --task "..."` generates a task-specific capsule to onboard the next session
 
 Auto-compile keeps your context files in sync — no need to run `dotctx compile` manually after mutations.
 
@@ -70,7 +74,7 @@ Auto-compile keeps your context files in sync — no need to run `dotctx compile
 
 ## Skills
 
-`dotctx init` installs two Claude Code slash commands in `.claude/commands/`:
+`dotctx init` installs three Claude Code slash commands in `.claude/commands/`:
 
 ### `/ctx-setup` — Deep codebase scan
 
@@ -88,6 +92,10 @@ A structured, 6-stage workflow for any development task:
 6. **Close** — Tiered: quick = nothing, standard = `push --sync`, deep = record decisions + resolve loops + compile
 
 Usage: `/ctx-work fix the authentication bug in login flow`
+
+### `/ctx-refresh` — Guided context refresh
+
+Reviews stale `.ctx/` files flagged by `dotctx audit`. Reads current source code, compares against context, and proposes updates using mutation commands. Tags AI-inferred changes with `[D]`.
 
 To update skills to the latest version: `dotctx upgrade`
 
@@ -145,6 +153,7 @@ dotctx serve
 - `ctx_push` — Record a session handoff note
 - `ctx_decide` — Record a decision
 - `ctx_landmine` — Mark intentional weirdness
+- `ctx_audit` — Audit context freshness and detect stale files
 
 **Resources** exposed:
 - `ctx://context` — Full compiled project context
@@ -191,6 +200,7 @@ Add to your MCP client config (e.g. Claude Desktop `claude_desktop_config.json`)
 | `dotctx hooks uninstall` | Remove git post-commit hook |
 | `dotctx skill install` | Install/update Claude Code skills |
 | `dotctx upgrade [--git-hooks] [--dry-run]` | Upgrade hooks, skills, and .ctxrc without touching .ctx/ content |
+| `dotctx audit [--json]` | Audit context freshness — stale files, drifted entries, ripple gaps |
 | `dotctx serve` | Start MCP server |
 
 All mutation commands support `--no-compile` to skip auto-compilation.

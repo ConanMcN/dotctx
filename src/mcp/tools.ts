@@ -1,6 +1,7 @@
 import { loadContext } from '../core/loader.js';
 import { generateCapsule } from '../core/capsule.js';
 import { generatePreflight } from '../core/preflight.js';
+import { runAudit } from '../core/audit.js';
 import type { CtxData } from '../types.js';
 import { writeYaml } from '../utils/yaml.js';
 import { appendToFile } from '../utils/markdown.js';
@@ -55,7 +56,7 @@ export function createTools(ctxDir: string): ToolDefinition[] {
       },
       handler: async (args) => {
         const ctx = loadContext(ctxDir);
-        const checklist = generatePreflight(ctx, args.task as string);
+        const checklist = generatePreflight(ctx, args.task as string, ctxDir);
         return textResult(checklist.formatted);
       },
     },
@@ -141,6 +142,20 @@ export function createTools(ctxDir: string): ToolDefinition[] {
         appendToFile(path.join(ctxDir, 'landmines.md'), row);
         autoCompile(ctxDir, { silent: true });
         return textResult(`Landmine marked: ${args.description}`);
+      },
+    },
+    {
+      name: 'ctx_audit',
+      description: 'Audit context freshness — checks for stale .ctx/ files, drifted entries (landmines/decisions referencing changed source files), and ripple map coverage gaps.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+        required: [],
+      },
+      handler: async () => {
+        const ctx = loadContext(ctxDir);
+        const result = runAudit(ctx, ctxDir);
+        return textResult(result.formatted);
       },
     },
   ];

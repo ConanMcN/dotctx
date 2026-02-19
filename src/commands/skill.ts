@@ -2,11 +2,12 @@ import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
-import { CTX_SETUP_SKILL, CTX_WORK_SKILL } from '../templates/skill.js';
+import { CTX_SETUP_SKILL, CTX_WORK_SKILL, CTX_REFRESH_SKILL } from '../templates/skill.js';
 
 const SKILLS: { filename: string; content: string; description: string }[] = [
   { filename: 'ctx-setup.md', content: CTX_SETUP_SKILL, description: 'Deep codebase scan to populate .ctx/ files' },
   { filename: 'ctx-work.md', content: CTX_WORK_SKILL, description: 'Context-aware development workflow' },
+  { filename: 'ctx-refresh.md', content: CTX_REFRESH_SKILL, description: 'Review and refresh stale context files' },
 ];
 
 function getSkillDir(cwd: string): string {

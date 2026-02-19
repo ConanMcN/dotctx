@@ -17,7 +17,7 @@ export function registerPreflight(program: Command): void {
       }
 
       const ctx = loadContext(ctxDir);
-      const checklist = generatePreflight(ctx, opts.task);
+      const checklist = generatePreflight(ctx, opts.task, ctxDir);
       console.log(checklist.formatted);
     });
 }

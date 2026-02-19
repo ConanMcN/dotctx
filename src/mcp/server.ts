@@ -128,7 +128,7 @@ export async function startMcpServer(): Promise<void> {
       const task = (request.params.arguments?.task as string) || 'general development';
       const ctx = loadContext(ctxDir);
       const capsule = generateCapsule(ctx, task, ctx.config.budget.default);
-      const preflight = generatePreflight(ctx, task);
+      const preflight = generatePreflight(ctx, task, ctxDir);
 
       return {
         description: `Session context for: ${task}`,

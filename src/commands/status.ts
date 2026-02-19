@@ -5,6 +5,7 @@ import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { countTokens } from '../utils/tokens.js';
 import { isStale, getExpiredLoops, getExpiringLoops } from '../core/freshness.js';
+import { getStaleFileWarnings } from '../core/audit.js';
 import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerStatus(program: Command): void {
@@ -78,6 +79,17 @@ export function registerStatus(program: Command): void {
         console.log(pc.yellow(`  ⚠ Stale (>${staleThreshold}h):`));
         for (const item of staleItems) {
           console.log(`    - ${item}`);
+        }
+        console.log('');
+      }
+
+      // File freshness (git-based)
+      const fileThreshold = ctx.config.freshness?.file_stale_threshold || '30d';
+      const staleWarnings = getStaleFileWarnings(ctxDir, fileThreshold);
+      if (staleWarnings.length) {
+        console.log(pc.yellow(`  ⚠ File freshness:`));
+        for (const w of staleWarnings) {
+          console.log(`    ${w}`);
         }
         console.log('');
       }

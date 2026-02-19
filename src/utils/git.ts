@@ -40,3 +40,21 @@ export function getGitFilesChanged(): string[] {
 export function getGitRoot(): string {
   return exec('git rev-parse --show-toplevel');
 }
+
+export function getFileLastModified(filePath: string): Date | null {
+  const output = exec(`git log -1 --format=%ci -- "${filePath}"`);
+  if (!output) return null;
+  const date = new Date(output);
+  return isNaN(date.getTime()) ? null : date;
+}
+
+export function getFileModifiedAfter(filePath: string, afterDate: string): boolean {
+  const output = exec(`git log --after="${afterDate}" --oneline -- "${filePath}"`);
+  return output.length > 0;
+}
+
+export function getCommitCountAfter(filePath: string, afterDate: string): number {
+  const output = exec(`git log --after="${afterDate}" --oneline -- "${filePath}"`);
+  if (!output) return 0;
+  return output.split('\n').filter(Boolean).length;
+}

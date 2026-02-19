@@ -74,6 +74,7 @@ export const ctxConfigSchema = z.object({
   ]),
   freshness: z.object({
     stale_threshold: z.string().default('48h'),
+    file_stale_threshold: z.string().default('30d'),
     loop_default_ttl: z.string().default('14d'),
     max_sessions: z.number().default(5),
   }).default({}),
@@ -136,6 +137,34 @@ export interface PreflightChecklist {
   decisions: Decision[];
   rippleMap: string[];
   openLoops: OpenLoop[];
+  formatted: string;
+}
+
+export interface FileStaleEntry {
+  file: string;
+  lastModified: Date | null;
+  daysAgo: number;
+  isStale: boolean;
+}
+
+export interface EntryDrift {
+  type: 'landmine' | 'decision';
+  description: string;
+  referencedFile: string;
+  entryDate: string;
+  commitsSinceEntry: number;
+}
+
+export interface RippleCoverageGap {
+  file: string;
+  reason: string;
+}
+
+export interface AuditResult {
+  fileStale: FileStaleEntry[];
+  entryDrift: EntryDrift[];
+  rippleGaps: RippleCoverageGap[];
+  summary: string;
   formatted: string;
 }
 

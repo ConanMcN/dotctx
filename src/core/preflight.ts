@@ -2,6 +2,7 @@ import type { CtxData, PreflightChecklist, Decision, Landmine, OpenLoop } from '
 import { CLI_NAME } from '../constants.js';
 import { getExpiredLoops, parseDuration } from './freshness.js';
 import { isGitRepo, getGitBranch } from '../utils/git.js';
+import { getStaleFileWarnings } from './audit.js';
 
 function extractKeywords(text: string): string[] {
   return text
@@ -16,7 +17,7 @@ function matches(text: string, keywords: string[]): boolean {
   return keywords.some(kw => lower.includes(kw));
 }
 
-export function generatePreflight(ctx: CtxData, task: string): PreflightChecklist {
+export function generatePreflight(ctx: CtxData, task: string, ctxDir?: string): PreflightChecklist {
   const keywords = extractKeywords(task);
 
   // Find relevant landmines
@@ -90,6 +91,13 @@ export function generatePreflight(ctx: CtxData, task: string): PreflightChecklis
     if (gitBranch && gitBranch !== ctx.current.branch) {
       healthWarnings.push(`🔀 Branch mismatch: git is on \`${gitBranch}\` but current.yaml says \`${ctx.current.branch}\`. Context may be from a different branch.`);
     }
+  }
+
+  // Stale .ctx/ file warnings (file-level only, lightweight)
+  if (ctxDir) {
+    const fileThreshold = ctx.config.freshness?.file_stale_threshold || '30d';
+    const staleWarnings = getStaleFileWarnings(ctxDir, fileThreshold);
+    healthWarnings.push(...staleWarnings);
   }
 
   // Format output

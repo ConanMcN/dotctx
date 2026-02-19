@@ -17,6 +17,7 @@ import { registerSkill } from './commands/skill.js';
 import { registerHooks } from './commands/hooks.js';
 import { registerUpgrade } from './commands/upgrade.js';
 import { registerCheck } from './commands/check.js';
+import { registerAudit } from './commands/audit.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json');
@@ -44,5 +45,6 @@ registerSkill(program);
 registerHooks(program);
 registerUpgrade(program);
 registerCheck(program);
+registerAudit(program);
 
 program.parse();

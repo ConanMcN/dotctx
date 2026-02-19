@@ -433,6 +433,8 @@ Sync the session state:
 dotctx push --sync
 \`\`\`
 
+If preflight showed stale context warnings, consider running \`/ctx-refresh\` after syncing.
+
 ### Deep
 Record everything for the next session:
 
@@ -466,6 +468,13 @@ Record everything for the next session:
    dotctx compile --target all
    \`\`\`
 
+7. **Check for stale context** — run audit and refresh if needed:
+   \`\`\`bash
+   dotctx audit
+   \`\`\`
+   If any files are flagged as stale and your task touched related areas, review and update them now.
+   Use dotctx mutation commands for structured updates, or edit markdown files directly for architecture/conventions.
+
 ---
 
 ## Summary
@@ -498,4 +507,38 @@ Recorded: [N decisions, N landmines, N loops resolved, N loops added]
 - **Landmines are sacred** — if preflight or the landmine guard warns about a file, read the landmine entry before touching it.
 - **Continue tasks** — if the task mentions "continue" or current.yaml shows related work, read session history for continuity.
 - **When in doubt, tier up** — it's better to over-verify than to miss a ripple effect.
+`;
+
+/**
+ * The ctx-refresh skill prompt — guides AI through reviewing and refreshing
+ * stale .ctx/ files flagged by `dotctx audit`.
+ *
+ * Designed for Claude Code slash command (/ctx-refresh).
+ */
+export const CTX_REFRESH_SKILL = `# ctx-refresh — Review and refresh stale context
+
+Run the audit to see what's stale:
+
+\`\`\`bash
+dotctx audit
+\`\`\`
+
+For each stale file, read the current .ctx/ content and the relevant source code, then propose updates:
+
+1. **architecture.md** — Re-scan directory structure, verify ripple map entries still exist, check for new files in core paths not in ripple map
+2. **conventions.md** — Compare patterns against recent code, verify anti-patterns still apply, check if new patterns emerged
+3. **decisions.md** — Verify decisions still apply, check if referenced alternatives are still relevant
+4. **landmines.md** — Verify landmine code still exists at referenced locations, check if the "weird" code is still there
+5. **vocabulary.md** — Check if terms are still used in codebase, add any new domain terms
+
+For structured entries use mutation commands:
+- \`dotctx decide ...\` / \`dotctx landmine ...\` / \`dotctx vocab ...\`
+
+For architecture.md and conventions.md, edit directly.
+
+Tag any AI-inferred updates with [D]. Recompile when done:
+
+\`\`\`bash
+dotctx compile --target all
+\`\`\`
 `;
