@@ -4,7 +4,7 @@ import path from 'node:path';
 import pc from 'picocolors';
 import { TEMPLATES } from '../templates/index.js';
 import { findCtxDir } from '../core/loader.js';
-import { installSkillDuringInit } from './skill.js';
+import { installSkillsDuringInit } from './skill.js';
 import {
   installClaudeHookDuringInit,
   installClaudePostCommitHook,
@@ -129,11 +129,12 @@ export function registerInit(program: Command): void {
         }
       }
 
-      // Install the ctx-setup skill as a Claude Code slash command
-      const skillPath = installSkillDuringInit(cwd);
-      if (skillPath) {
-        console.log(`  ${pc.green('✓')} Skill installed: ${pc.dim('.claude/commands/')}ctx-setup.md`);
-        console.log(`    Use ${pc.cyan('/ctx-setup')} in Claude Code to auto-populate .ctx/ files.`);
+      // Install skills as Claude Code slash commands
+      const skillPaths = installSkillsDuringInit(cwd);
+      if (skillPaths) {
+        console.log(`  ${pc.green('✓')} Skills installed: ${pc.dim('.claude/commands/')}`);
+        console.log(`    ${pc.cyan('/ctx-setup')} — Deep codebase scan to populate .ctx/ files`);
+        console.log(`    ${pc.cyan('/ctx-work')}  — Context-aware development workflow`);
         console.log('');
       }
 
@@ -183,7 +184,8 @@ export function registerInit(program: Command): void {
         }
       }
 
-      console.log(`  Next: Run ${pc.cyan('/ctx-setup')} in Claude Code, or edit ${pc.cyan('.ctx/stack.yaml')} manually.`);
+      console.log(`  Next: Run ${pc.cyan('/ctx-setup')} in Claude Code to populate .ctx/ files,`);
+      console.log(`        then use ${pc.cyan('/ctx-work')} for context-aware development.`);
 
       // Suggest dev dependency if package.json exists
       const pkgPath = path.join(cwd, 'package.json');

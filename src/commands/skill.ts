@@ -2,28 +2,31 @@ import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
-import { CTX_SETUP_SKILL } from '../templates/skill.js';
+import { CTX_SETUP_SKILL, CTX_WORK_SKILL } from '../templates/skill.js';
 
-const SKILL_FILENAME = 'ctx-setup.md';
+const SKILLS: { filename: string; content: string; description: string }[] = [
+  { filename: 'ctx-setup.md', content: CTX_SETUP_SKILL, description: 'Deep codebase scan to populate .ctx/ files' },
+  { filename: 'ctx-work.md', content: CTX_WORK_SKILL, description: 'Context-aware development workflow' },
+];
 
 function getSkillDir(cwd: string): string {
   return path.join(cwd, '.claude', 'commands');
 }
 
-function installSkill(cwd: string): { path: string; created: boolean } {
+function installSkills(cwd: string): string[] {
   const skillDir = getSkillDir(cwd);
-  const skillPath = path.join(skillDir, SKILL_FILENAME);
-
   fs.mkdirSync(skillDir, { recursive: true });
-  fs.writeFileSync(skillPath, CTX_SETUP_SKILL, 'utf-8');
-
-  return { path: skillPath, created: true };
+  return SKILLS.map(({ filename, content }) => {
+    const p = path.join(skillDir, filename);
+    fs.writeFileSync(p, content, 'utf-8');
+    return p;
+  });
 }
 
-export function installSkillDuringInit(cwd: string): string | null {
+export function installSkillsDuringInit(cwd: string): string[] | null {
   try {
-    const result = installSkill(cwd);
-    return result.path;
+    const paths = installSkills(cwd);
+    return paths.length > 0 ? paths : null;
   } catch {
     return null;
   }
@@ -36,18 +39,22 @@ export function registerSkill(program: Command): void {
 
   skill
     .command('install')
-    .description('Install the ctx-setup skill as a Claude Code slash command')
+    .description('Install dotctx skills as Claude Code slash commands')
     .option('--dir <path>', 'Target directory (defaults to cwd)')
     .action((opts) => {
       const cwd = opts.dir ? path.resolve(opts.dir) : process.cwd();
 
-      const result = installSkill(cwd);
+      installSkills(cwd);
 
-      console.log(pc.green('✓ Skill installed'));
+      console.log(pc.green('✓ Skills installed'));
       console.log('');
-      console.log(`  ${pc.dim('.claude/commands/')}${SKILL_FILENAME}`);
+      console.log(`  ${pc.dim('.claude/commands/')}`);
+      for (const { filename, description } of SKILLS) {
+        const name = filename.replace('.md', '');
+        console.log(`    ${pc.cyan(`/${name}`)}  — ${description}`);
+      }
       console.log('');
-      console.log(`  Use ${pc.cyan('/ctx-setup')} in Claude Code to run a deep codebase scan.`);
+      console.log(`  Use these slash commands in Claude Code.`);
       console.log(`  Or copy the file contents into ChatGPT, Cursor, or Copilot Chat.`);
     });
 }

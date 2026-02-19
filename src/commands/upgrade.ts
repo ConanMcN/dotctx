@@ -6,7 +6,7 @@ import { findCtxDir } from '../core/loader.js';
 import { NO_CTX_DIR_MSG } from '../constants.js';
 import { upgradeClaudeHooks } from '../utils/claude-hooks.js';
 import { upgradeCursorHooks } from '../utils/cursor-hooks.js';
-import { installSkillDuringInit } from './skill.js';
+import { installSkillsDuringInit } from './skill.js';
 import { readYaml, writeYaml } from '../utils/yaml.js';
 
 const HOOK_MARKER = '# dotctx: auto-update context after commit';
@@ -123,12 +123,12 @@ export function registerUpgrade(program: Command): void {
         ] });
       }
 
-      // Skill
+      // Skills
       if (!opts.dryRun) {
-        const skillPath = installSkillDuringInit(cwd);
-        if (skillPath) allChanges.push({ section: 'Skill', items: ['Updated ctx-setup.md'] });
+        const skillPaths = installSkillsDuringInit(cwd);
+        if (skillPaths) allChanges.push({ section: 'Skills', items: ['Updated ctx-setup.md', 'Updated ctx-work.md'] });
       } else {
-        allChanges.push({ section: 'Skill', items: ['Would update ctx-setup.md'] });
+        allChanges.push({ section: 'Skills', items: ['Would update ctx-setup.md', 'Would update ctx-work.md'] });
       }
 
       // .ctxrc budget merge
