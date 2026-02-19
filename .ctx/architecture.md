@@ -12,15 +12,15 @@
 | `src/core/` | [D] Core logic: compiler, capsule generator, loader, precedence, freshness |
 | `src/core/adapters/` | [D] Output adapters: claude, cursor, copilot, system |
 | `src/mcp/` | [D] MCP server (stdio transport), tools, resources, and prompts |
-| `src/templates/` | [D] Scaffold templates for `init` and the ctx-setup skill prompt |
+| `src/templates/` | [D] Scaffold templates for `init` and skill prompts (ctx-setup, ctx-work) |
 | `src/utils/` | [D] Helpers: git, markdown parsing, token counting, YAML I/O, autocompile, editor hooks |
 | `src/utils/autocompile.ts` | Auto-recompile all adapters after mutation commands |
 | `src/utils/claude-hooks.ts` | Install Claude Code UserPromptSubmit hook during init |
 | `src/utils/cursor-hooks.ts` | Install Cursor sessionStart hook during init |
 | `src/__tests__/` | [D] Vitest unit tests |
 | `.ctx/` | [D] The context directory this tool manages (also used on itself) |
-| `.claude/commands/` | [D] Claude Code slash command (ctx-setup.md skill) |
-| `.claude/hooks/` | Claude Code UserPromptSubmit hook (dotctx-preflight.sh) |
+| `.claude/commands/` | [D] Claude Code slash commands (ctx-setup.md, ctx-work.md skills) |
+| `.claude/hooks/` | Claude Code hooks (preflight, post-commit, session-sync, landmine-guard, ripple-check) |
 | `.changeset/` | Changesets config for version management |
 
 ## Ripple map

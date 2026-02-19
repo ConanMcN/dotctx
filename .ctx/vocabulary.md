@@ -22,3 +22,6 @@
 | editor hook | A shell script installed into an editor's hook system (.claude/hooks/, .cursor/hooks/) that auto-injects dotctx context — NOT a React hook or git hook |
 | UserPromptSubmit | Claude Code hook event that fires on every user prompt — stdout is injected as context into the conversation |
 | sessionStart | Cursor hook event that fires when a new session begins — returns JSON with `additional_context` field |
+| skill | A markdown prompt file installed in `.claude/commands/` as a Claude Code slash command — NOT a programming skill or ability |
+| ctx-work | The `/ctx-work` slash command — a 6-stage context-aware development workflow (Triage → Scope → Plan → Build → Verify → Close) — NOT a CLI command |
+| tier (quick/standard/deep) | Task complexity classification determined by preflight output — controls depth of scoping, planning, verification, and close stages |

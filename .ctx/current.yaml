@@ -1,26 +1,18 @@
 branch: main
-task: Auto-install editor hooks during dotctx init
+task: Add /ctx-work skill and multi-skill refactor
 state: in-progress
 next_step: ''
 blocked_by: ''
 files_touched:
-  - ctx/.ctxrc
+  - .claude/commands/ctx-work.md
+  - .ctx/architecture.md
+  - .ctx/conventions.md
   - .ctx/current.yaml
+  - .ctx/decisions.md
+  - .ctx/vocabulary.md
   - .cursorrules
   - .github/copilot-instructions.md
   - CLAUDE.md
-  - src/bin.ts
-  - src/commands/init.ts
-  - src/commands/push.ts
-  - src/core/preflight.ts
-  - src/templates/index.ts
-  - src/utils/claude-hooks.ts
-  - src/utils/cursor-hooks.ts
-  - src/utils/git.ts
-  - .claude/hooks/
-  - .claude/settings.json
-  - .ctx/sessions/
-  - .github/workflows/
-  - src/commands/check.ts
-  - src/commands/upgrade.ts
+  - package-lock.json
+  - package.json
 updated_at: '2026-02-19'

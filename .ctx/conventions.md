@@ -16,7 +16,8 @@
 - Mutation commands: call `autoCompile(ctxDir)` after writing, support `--no-compile` flag to skip
 - MCP autocompile: use `autoCompile(ctxDir, { silent: true })` — never print to stdout in MCP context
 - CLI version: read dynamically from `package.json` via `createRequire` — never hardcode
-- Editor hook install: follows `installSkillDuringInit` pattern — returns `string | null`, idempotent, merge-safe with existing config
+- Editor hook install: follows `installSkillsDuringInit` pattern — returns `string[] | null`, idempotent, merge-safe with existing config
+- Multi-skill install: `SKILLS` array in `skill.ts` — each skill has filename, content, and description; `installSkills()` writes all in one pass
 - Hook scripts: try direct binary → `node_modules/.bin/` → `npx --yes` (speed optimization, graceful fallback)
 
 ## Anti-patterns

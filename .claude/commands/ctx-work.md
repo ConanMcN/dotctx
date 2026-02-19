@@ -203,6 +203,8 @@ Sync the session state:
 dotctx push --sync
 ```
 
+If preflight showed stale context warnings, consider running `/ctx-refresh` after syncing.
+
 ### Deep
 Record everything for the next session:
 
@@ -235,6 +237,13 @@ Record everything for the next session:
    ```bash
    dotctx compile --target all
    ```
+
+7. **Check for stale context** — run audit and refresh if needed:
+   ```bash
+   dotctx audit
+   ```
+   If any files are flagged as stale and your task touched related areas, review and update them now.
+   Use dotctx mutation commands for structured updates, or edit markdown files directly for architecture/conventions.
 
 ---
 

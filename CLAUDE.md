@@ -2,9 +2,9 @@
 
 ## Current
 Branch: main
-Task: Auto-install editor hooks during dotctx init
+Task: Add /ctx-work skill and multi-skill refactor
 State: in-progress
-Files: .ctx/.ctxrc, src/bin.ts, src/commands/init.ts, src/templates/index.ts, src/utils/claude-hooks.ts, src/utils/cursor-hooks.ts
+Files: .claude/commands/ctx-work.md, .ctx/architecture.md, .ctx/conventions.md, .ctx/current.yaml, .ctx/decisions.md, .ctx/vocabulary.md, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, package-lock.json, package.json
 
 ## Landmines
 - [D] `console.error` instead of `console.log` in serve command (src/commands/serve.ts:10) — [D] MCP server uses stdout for stdio transport — any console.log would corrupt the protocol
@@ -36,6 +36,7 @@ Files: .ctx/.ctxrc, src/bin.ts, src/commands/init.ts, src/templates/index.ts, sr
 - Cursor hook runs capsule at session start (over: Per-prompt hook) — Cursor's beforeSubmitPrompt can't inject context; sessionStart can via additional_context JSON
 - Hook script tries binary → node_modules → npx (over: npx only, direct path only) — Speed optimization — avoids npx overhead when binary is available locally
 - Cursor hooks only install if .cursor/ exists (over: Always install) — Respects user's editor choice — don't create .cursor/ for non-Cursor users
+- Single-file /ctx-work skill with dynamic tiers (over: Separate markdown files per stage, Static workflow without tiers) — dotctx handles filtering/budgeting; tiers adapt depth to actual preflight output; one file is simpler to maintain
 
 ## Conventions
 # Conventions
@@ -56,7 +57,8 @@ Files: .ctx/.ctxrc, src/bin.ts, src/commands/init.ts, src/templates/index.ts, sr
 - Mutation commands: call `autoCompile(ctxDir)` after writing, support `--no-compile` flag to skip
 - MCP autocompile: use `autoCompile(ctxDir, { silent: true })` — never print to stdout in MCP context
 - CLI version: read dynamically from `package.json` via `createRequire` — never hardcode
-- Editor hook install: follows `installSkillDuringInit` pattern — returns `string | null`, idempotent, merge-safe with existing config
+- Editor hook install: follows `installSkillsDuringInit` pattern — returns `string[] | null`, idempotent, merge-safe with existing config
+- Multi-skill install: `SKILLS` array in `skill.ts` — each skill has filename, content, and description; `installSkills()` writes all in one pass
 - Hook scripts: try direct binary → `node_modules/.bin/` → `npx --yes` (speed optimization, graceful fallback)
 
 ## Anti-patterns
@@ -99,15 +101,15 @@ Files: .ctx/.ctxrc, src/bin.ts, src/commands/init.ts, src/templates/index.ts, sr
 | `src/core/` | [D] Core logic: compiler, capsule generator, loader, precedence, freshness |
 | `src/core/adapters/` | [D] Output adapters: claude, cursor, copilot, system |
 | `src/mcp/` | [D] MCP server (stdio transport), tools, resources, and prompts |
-| `src/templates/` | [D] Scaffold templates for `init` and the ctx-setup skill prompt |
+| `src/templates/` | [D] Scaffold templates for `init` and skill prompts (ctx-setup, ctx-work) |
 | `src/utils/` | [D] Helpers: git, markdown parsing, token counting, YAML I/O, autocompile, editor hooks |
 | `src/utils/autocompile.ts` | Auto-recompile all adapters after mutation commands |
 | `src/utils/claude-hooks.ts` | Install Claude Code UserPromptSubmit hook during init |
 | `src/utils/cursor-hooks.ts` | Install Cursor sessionStart hook during init |
 | `src/__tests__/` | [D] Vitest unit tests |
 | `.ctx/` | [D] The context directory this tool manages (also used on itself) |
-| `.claude/commands/` | [D] Claude Code slash command (ctx-setup.md skill) |
-| `.claude/hooks/` | Claude Code UserPromptSubmit hook (dotctx-preflight.sh) |
+| `.claude/commands/` | [D] Claude Code slash commands (ctx-setup.md, ctx-work.md skills) |
+| `.claude/hooks/` | Claude Code hooks (preflight, post-commit, session-sync, landmine-guard, ripple-check) |
 | `.changeset/` | Changesets config for version management |
 
 ## Ripple map
@@ -174,9 +176,11 @@ Mutation flow:
 - **editor hook**: A shell script installed into an editor's hook system (.claude/hooks/, .cursor/hooks/) that auto-injects dotctx context — NOT a React hook or git hook
 - **UserPromptSubmit**: Claude Code hook event that fires on every user prompt — stdout is injected as context into the conversation
 - **sessionStart**: Cursor hook event that fires when a new session begins — returns JSON with `additional_context` field
+- **skill**: A markdown prompt file installed in `.claude/commands/` as a Claude Code slash command — NOT a programming skill or ability
+- **ctx-work**: The `/ctx-work` slash command — a 6-stage context-aware development workflow (Triage → Scope → Plan → Build → Verify → Close) — NOT a CLI command
 
 ## Session Log
-Last session (2026-02-19): Commits: a45fefb fix: use new Claude Code hooks format with nested matcher groups; cf8aa73 chore: bump to 0.2.5; 776688c docs: add editor hooks section to README
+Last session (2026-02-19): Commits: 5eea11c feat: add dotctx audit command for context staleness detection; 00efeb2 feat: add /ctx-work context-aware development workflow skill; 6b48abb feat: add 3 new Claude Code hooks, check command, push --sync, and enhanced preflight
 
 # AI Context Bootstrap
 

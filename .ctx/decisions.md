@@ -23,3 +23,4 @@
 | Cursor hook runs capsule at session start | Per-prompt hook | Cursor's beforeSubmitPrompt can't inject context; sessionStart can via additional_context JSON | 2026-02-18 |
 | Hook script tries binary → node_modules → npx | npx only, direct path only | Speed optimization — avoids npx overhead when binary is available locally | 2026-02-18 |
 | Cursor hooks only install if .cursor/ exists | Always install | Respects user's editor choice — don't create .cursor/ for non-Cursor users | 2026-02-18 |
+| Single-file /ctx-work skill with dynamic tiers | Separate markdown files per stage, Static workflow without tiers | dotctx handles filtering/budgeting; tiers adapt depth to actual preflight output; one file is simpler to maintain | 2026-02-19 |
