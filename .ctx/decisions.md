@@ -23,7 +23,8 @@
 | Cursor hook runs capsule at session start | Per-prompt hook | Cursor's beforeSubmitPrompt can't inject context; sessionStart can via additional_context JSON | 2026-02-18 |
 | Hook script tries binary → node_modules → npx | npx only, direct path only | Speed optimization — avoids npx overhead when binary is available locally | 2026-02-18 |
 | Cursor hooks only install if .cursor/ exists | Always install | Respects user's editor choice — don't create .cursor/ for non-Cursor users | 2026-02-18 |
-| Single-file /ctx-work skill with dynamic tiers | Separate markdown files per stage, Static workflow without tiers | dotctx handles filtering/budgeting; tiers adapt depth to actual preflight output; one file is simpler to maintain | 2026-02-19 |
 | Git-based file staleness over timestamp files | mtime, manual timestamps, .last-updated files | Zero infrastructure, works with git history, no extra files to track | 2026-02-19 |
 | Health section appended outside token budget | Inside budget, separate file, separate section | ~50 tokens fixed cost, too important to truncate, applies to all adapters uniformly | 2026-02-19 |
 | Audit is read-only (no mutations) | Auto-fix, interactive prompts | Audit detects and reports; /ctx-refresh guides the fix — separation of concerns | 2026-02-19 |
+| Split ctx-work into orchestrator + linked files for progressive disclosure | Single monolithic skill file, Separate files per stage | SKILL.md orchestrates all tiers; Deep tier loads deep-verify.md and deep-close.md on demand; Quick/Standard save ~600-800 tokens by never loading linked files | 2026-02-20 |
+| Skills use .claude/skills/ directory format | .claude/commands/ flat files | Modern Claude Code format — supports linked files for progressive disclosure, frontmatter metadata, and monorepo skill discovery | 2026-02-20 |

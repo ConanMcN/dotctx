@@ -228,7 +228,7 @@ function checkStaleness(ctxDir: string): Check {
   try {
     const ctx = loadContext(ctxDir);
     const audit = runAudit(ctx, ctxDir);
-    const staleCount = audit.staleFiles.length;
+    const staleCount = audit.fileStale.filter(f => f.isStale).length;
     const driftCount = audit.entryDrift.length;
 
     if (staleCount === 0 && driftCount === 0) {

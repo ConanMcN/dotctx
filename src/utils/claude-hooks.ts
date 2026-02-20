@@ -192,11 +192,12 @@ function hasHookRegistered(settings: Record<string, unknown>, eventType: string,
   const hooks = settings?.hooks as Record<string, unknown[]> | undefined;
   const matcherGroups = hooks?.[eventType];
   if (!Array.isArray(matcherGroups)) return false;
-  return matcherGroups.some((group: { hooks?: { command?: string }[] }) =>
-    Array.isArray(group.hooks) && group.hooks.some(
+  return matcherGroups.some((group) => {
+    const g = group as { hooks?: { command?: string }[] };
+    return Array.isArray(g.hooks) && g.hooks.some(
       (h) => typeof h.command === 'string' && h.command.includes(markerSubstring)
-    )
-  );
+    );
+  });
 }
 
 function registerHookInSettings(

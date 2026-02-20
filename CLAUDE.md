@@ -4,7 +4,7 @@
 Branch: main
 Task: Add /ctx-work skill and multi-skill refactor
 State: in-progress
-Files: ctx/current.yaml, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, .ctx/sessions/2026-02-20T17-27-11.yaml, .ctx/sessions/2026-02-20T17-30-16.yaml, .ctx/sessions/2026-02-20T17-36-55.yaml
+Files: ctx/current.yaml, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, .ctx/sessions/2026-02-20T17-27-11.yaml, .ctx/sessions/2026-02-20T17-30-16.yaml, .ctx/sessions/2026-02-20T17-36-55.yaml, .ctx/sessions/2026-02-20T17-38-24.yaml, .ctx/sessions/2026-02-20T17-40-06.yaml, .ctx/sessions/2026-02-20T17-40-50.yaml
 
 ## Landmines
 - [D] `console.error` instead of `console.log` in serve command (src/commands/serve.ts:10) — [D] MCP server uses stdout for stdio transport — any console.log would corrupt the protocol
@@ -36,10 +36,11 @@ Files: ctx/current.yaml, .cursorrules, .github/copilot-instructions.md, CLAUDE.m
 - Cursor hook runs capsule at session start (over: Per-prompt hook) — Cursor's beforeSubmitPrompt can't inject context; sessionStart can via additional_context JSON
 - Hook script tries binary → node_modules → npx (over: npx only, direct path only) — Speed optimization — avoids npx overhead when binary is available locally
 - Cursor hooks only install if .cursor/ exists (over: Always install) — Respects user's editor choice — don't create .cursor/ for non-Cursor users
-- Single-file /ctx-work skill with dynamic tiers (over: Separate markdown files per stage, Static workflow without tiers) — dotctx handles filtering/budgeting; tiers adapt depth to actual preflight output; one file is simpler to maintain
 - Git-based file staleness over timestamp files (over: mtime, manual timestamps, .last-updated files) — Zero infrastructure, works with git history, no extra files to track
 - Health section appended outside token budget (over: Inside budget, separate file, separate section) — ~50 tokens fixed cost, too important to truncate, applies to all adapters uniformly
 - Audit is read-only (no mutations) (over: Auto-fix, interactive prompts) — Audit detects and reports; /ctx-refresh guides the fix — separation of concerns
+- Split ctx-work into orchestrator + linked files for progressive disclosure (over: Single monolithic skill file, Separate files per stage) — SKILL.md orchestrates all tiers; Deep tier loads deep-verify.md and deep-close.md on demand; Quick/Standard save ~600-800 tokens by never loading linked files
+- Skills use .claude/skills/ directory format (over: .claude/commands/ flat files) — Modern Claude Code format — supports linked files for progressive disclosure, frontmatter metadata, and monorepo skill discovery
 
 ## Conventions
 # Conventions
@@ -183,16 +184,17 @@ Mutation flow:
 - **editor hook**: A shell script installed into an editor's hook system (.claude/hooks/, .cursor/hooks/) that auto-injects dotctx context — NOT a React hook or git hook
 - **UserPromptSubmit**: Claude Code hook event that fires on every user prompt — stdout is injected as context into the conversation
 - **sessionStart**: Cursor hook event that fires when a new session begins — returns JSON with `additional_context` field
-- **skill**: A markdown prompt file installed in `.claude/commands/` as a Claude Code slash command — NOT a programming skill or ability
+- **skill**: A markdown prompt file installed in `.claude/skills/<name>/SKILL.md` as a Claude Code slash command — supports linked files for progressive disclosure — NOT a programming skill or ability
 - **ctx-work**: The `/ctx-work` slash command — a 6-stage context-aware development workflow (Triage → Scope → Plan → Build → Verify → Close) — NOT a CLI command
 - **audit**: A read-only analysis of .ctx/ file freshness, entry drift, and ripple map coverage — NOT a security audit
 - **context health**: A summary section appended to compiled output showing stale .ctx/ files — only appears when staleness is detected
 - **entry drift**: When a landmine or decision references a source file that has changed since the entry was recorded — signals the entry may need review
 - **file staleness**: Git-based age of a .ctx/ file measured against file_stale_threshold (default 30d) — NOT the same as current.yaml staleness which uses stale_threshold
 - **ctx-refresh**: The /ctx-refresh slash command — guides AI through reviewing and updating stale .ctx/ files flagged by audit — NOT a CLI command
+- **progressive disclosure**: Splitting a skill into an orchestrator SKILL.md plus linked reference files (e.g. deep-verify.md) that are only loaded when the task tier requires them — reduces per-invocation token cost for simpler tasks
 
 ## Session Log
-Last session (2026-02-20): Commits: 18e04aa chore: clean up stale changesets and add 0.6.1 changeset; 6b631c5 chore: bump to 0.6.1; c7895b4 test: add preflight and loader unit tests
+Last session (2026-02-20): Commits: f47ee3e chore: bump to 0.6.2; 792c41c docs: add session lifecycle section to README; 93dc6f4 chore: refresh drifted landmine dates and fix line reference
 
 # AI Context Bootstrap
 
