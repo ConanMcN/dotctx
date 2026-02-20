@@ -1,16 +1,9 @@
 branch: main
 task: Add /ctx-work skill and multi-skill refactor
-state: in-progress
+state: done
 next_step: ''
 blocked_by: ''
 files_touched:
-  - ctx/current.yaml
-  - .cursorrules
-  - .github/copilot-instructions.md
-  - CLAUDE.md
-  - package-lock.json
-  - .ctx/sessions/2026-02-19T17-45-43.yaml
-  - .ctx/sessions/2026-02-19T17-46-48.yaml
-  - .ctx/sessions/2026-02-19T17-47-22.yaml
-  - .ctx/sessions/2026-02-20T16-43-01.yaml
+  - src/__tests__/preflight.test.ts
+  - src/__tests__/loader.test.ts
 updated_at: '2026-02-20'

@@ -4,7 +4,6 @@
 Branch: main
 Task: Add /ctx-work skill and multi-skill refactor
 State: in-progress
-Files: package-lock.json
 
 ## Landmines
 - [D] `console.error` instead of `console.log` in serve command (src/commands/serve.ts:10) — [D] MCP server uses stdout for stdio transport — any console.log would corrupt the protocol
@@ -192,7 +191,7 @@ Mutation flow:
 - **ctx-refresh**: The /ctx-refresh slash command — guides AI through reviewing and updating stale .ctx/ files flagged by audit — NOT a CLI command
 
 ## Session Log
-Last session (2026-02-20): Commits: 25b2201 feat: add doctor command and preflight --brief mode; e9b7354 chore: bump to 0.5.0; 79b1ee6 chore: recompile adapter outputs and update .ctx/ files
+Last session (2026-02-20): Commits: 8a26000 chore: update .ctx/ session files and recompile adapter outputs; 25b2201 feat: add doctor command and preflight --brief mode; e9b7354 chore: bump to 0.5.0
 
 # AI Context Bootstrap
 
