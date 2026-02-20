@@ -132,9 +132,10 @@ export function registerInit(program: Command): void {
       // Install skills as Claude Code slash commands
       const skillPaths = installSkillsDuringInit(cwd);
       if (skillPaths) {
-        console.log(`  ${pc.green('✓')} Skills installed: ${pc.dim('.claude/commands/')}`);
-        console.log(`    ${pc.cyan('/ctx-setup')} — Deep codebase scan to populate .ctx/ files`);
-        console.log(`    ${pc.cyan('/ctx-work')}  — Context-aware development workflow`);
+        console.log(`  ${pc.green('✓')} Skills installed: ${pc.dim('.claude/skills/')}`);
+        console.log(`    ${pc.cyan('/ctx-setup')}   — Deep codebase scan to populate .ctx/ files`);
+        console.log(`    ${pc.cyan('/ctx-work')}    — Context-aware development workflow`);
+        console.log(`    ${pc.cyan('/ctx-refresh')} — Review and refresh stale context files`);
         console.log('');
       }
 

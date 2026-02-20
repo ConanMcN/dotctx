@@ -1,8 +1,21 @@
+---
+argument-hint: <task description>
+---
+
 # ctx-work — Context-aware development workflow
 
 You are about to work on a task using structured, context-aware development. This workflow uses dotctx to inject project-specific warnings, conventions, and dependencies at every stage — so you never miss a landmine, break a ripple, or violate a convention.
 
 **Task:** $ARGUMENTS
+
+## Rules
+
+- **Trust the hooks** — landmine guard and ripple check fire automatically. Don't duplicate their work.
+- **Respect the tier** — don't over-engineer a quick fix or under-verify a deep change.
+- **Conventions are constraints** — anti-patterns and AI failure modes from .ctx/conventions.md are things you MUST avoid, not suggestions.
+- **Landmines are sacred** — if preflight or the landmine guard warns about a file, read the landmine entry before touching it.
+- **Continue tasks** — if the task mentions "continue" or current.yaml shows related work, read session history for continuity.
+- **When in doubt, tier up** — it's better to over-verify than to miss a ripple effect.
 
 ---
 
@@ -16,6 +29,7 @@ dotctx preflight --task "$ARGUMENTS"
 
 **Classify the task tier based on preflight output:**
 
+<tier-signals>
 | Signal | Quick | Standard | Deep |
 |--------|-------|----------|------|
 | Landmines found | 0 | 1–2 | 3+ |
@@ -23,6 +37,7 @@ dotctx preflight --task "$ARGUMENTS"
 | Constraining decisions | 0 | 1–2 | 3+ |
 | Files likely touched | 1–2 | 3–5 | 6+ |
 | Open loops related | 0 | 0–1 | 2+ |
+</tier-signals>
 
 **Use the highest tier triggered by any signal.** If unsure, go one tier up.
 
@@ -144,48 +159,12 @@ Verify proportional to the tier.
 Re-read the modified file(s) to confirm correctness. Check for obvious issues.
 
 ### Standard
-Run the project's test suite:
+Run the project's test suite using its package manager (check for `bun.lockb`, `pnpm-lock.yaml`, `yarn.lock`, or `package-lock.json` to determine the runner).
 
-```bash
-npm test
-```
-
-If tests fail, fix them before proceeding. If the project uses TypeScript, also run:
-
-```bash
-npx tsc --noEmit
-```
+If tests fail, fix them before proceeding. If the project uses TypeScript, also run `tsc --noEmit` via the package runner.
 
 ### Deep
-Everything from Standard, plus:
-
-1. **Ripple verification** — For each file in the ripple map that your changes affect, verify the downstream files still work correctly:
-   ```bash
-   dotctx preflight --task "verify ripple effects of changes to [files changed]"
-   ```
-
-2. **Full test suite** — Run the complete test suite, not just related tests:
-   ```bash
-   npm test
-   ```
-
-3. **Type check** — Verify no type errors were introduced:
-   ```bash
-   npx tsc --noEmit
-   ```
-
-4. **Lint** (if available):
-   ```bash
-   npm run lint 2>/dev/null || true
-   ```
-
-Report verification results clearly:
-```
-Verification:
-  Tests: [pass/fail]
-  Types: [pass/fail]
-  Ripple check: [clean/issues found]
-```
+Everything from Standard, plus full verification. Read `deep-verify.md` for detailed procedures including ripple verification, full test suite, type checking, and lint.
 
 ---
 
@@ -206,44 +185,7 @@ dotctx push --sync
 If preflight showed stale context warnings, consider running `/ctx-refresh` after syncing.
 
 ### Deep
-Record everything for the next session:
-
-1. **Record new decisions** made during implementation:
-   ```bash
-   dotctx decide "<decision>" --over "<alternatives>" --why "<reasoning>"
-   ```
-
-2. **Mark new landmines** if you wrote code that looks wrong but is intentional:
-   ```bash
-   dotctx landmine "<description>" --file "<path:line>" --why "<reason>"
-   ```
-
-3. **Resolve related open loops** that this task addressed:
-   ```bash
-   dotctx loop resolve <id>
-   ```
-
-4. **Add new open loops** for follow-up work discovered during implementation:
-   ```bash
-   dotctx loop add "<description>" --ttl 14d
-   ```
-
-5. **Sync session state:**
-   ```bash
-   dotctx push --sync
-   ```
-
-6. **Recompile context** (if mutations were made above):
-   ```bash
-   dotctx compile --target all
-   ```
-
-7. **Check for stale context** — run audit and refresh if needed:
-   ```bash
-   dotctx audit
-   ```
-   If any files are flagged as stale and your task touched related areas, review and update them now.
-   Use dotctx mutation commands for structured updates, or edit markdown files directly for architecture/conventions.
+Record everything for the next session. Read `deep-close.md` for full close procedures including recording decisions, marking landmines, resolving loops, syncing state, and running audit.
 
 ---
 
@@ -251,7 +193,7 @@ Record everything for the next session:
 
 Print a brief summary of what was done:
 
-```
+<summary-template>
 ✓ ctx-work complete
 
 Task: $ARGUMENTS
@@ -265,15 +207,4 @@ Verification: [pass/fail summary]
 
 [If deep:]
 Recorded: [N decisions, N landmines, N loops resolved, N loops added]
-```
-
----
-
-## Important notes
-
-- **Trust the hooks** — landmine guard and ripple check fire automatically. Don't duplicate their work.
-- **Respect the tier** — don't over-engineer a quick fix or under-verify a deep change.
-- **Conventions are constraints** — anti-patterns and AI failure modes from .ctx/conventions.md are things you MUST avoid, not suggestions.
-- **Landmines are sacred** — if preflight or the landmine guard warns about a file, read the landmine entry before touching it.
-- **Continue tasks** — if the task mentions "continue" or current.yaml shows related work, read session history for continuity.
-- **When in doubt, tier up** — it's better to over-verify than to miss a ripple effect.
+</summary-template>

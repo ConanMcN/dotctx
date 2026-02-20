@@ -123,12 +123,42 @@ export function registerUpgrade(program: Command): void {
         ] });
       }
 
-      // Skills
+      // Skills (migrate to .claude/skills/ and clean up legacy .claude/commands/ctx-*.md)
       if (!opts.dryRun) {
         const skillPaths = installSkillsDuringInit(cwd);
-        if (skillPaths) allChanges.push({ section: 'Skills', items: ['Updated ctx-setup.md', 'Updated ctx-work.md'] });
+        const skillChanges: string[] = [];
+        if (skillPaths) {
+          skillChanges.push('Installed skills to .claude/skills/');
+        }
+        // Remove legacy .claude/commands/ctx-*.md files
+        const legacySkills = ['ctx-setup.md', 'ctx-work.md', 'ctx-refresh.md'];
+        const legacyDir = path.join(cwd, '.claude', 'commands');
+        for (const f of legacySkills) {
+          const legacyPath = path.join(legacyDir, f);
+          if (fs.existsSync(legacyPath)) {
+            fs.unlinkSync(legacyPath);
+            skillChanges.push(`Removed legacy ${f} from .claude/commands/`);
+          }
+        }
+        // Remove .claude/commands/ if empty after cleanup
+        if (fs.existsSync(legacyDir)) {
+          const remaining = fs.readdirSync(legacyDir);
+          if (remaining.length === 0) {
+            fs.rmdirSync(legacyDir);
+            skillChanges.push('Removed empty .claude/commands/ directory');
+          }
+        }
+        if (skillChanges.length) allChanges.push({ section: 'Skills', items: skillChanges });
       } else {
-        allChanges.push({ section: 'Skills', items: ['Would update ctx-setup.md', 'Would update ctx-work.md'] });
+        const dryItems = ['Would install skills to .claude/skills/'];
+        const legacySkills = ['ctx-setup.md', 'ctx-work.md', 'ctx-refresh.md'];
+        const legacyDir = path.join(cwd, '.claude', 'commands');
+        for (const f of legacySkills) {
+          if (fs.existsSync(path.join(legacyDir, f))) {
+            dryItems.push(`Would remove legacy ${f} from .claude/commands/`);
+          }
+        }
+        allChanges.push({ section: 'Skills', items: dryItems });
       }
 
       // .ctxrc budget merge

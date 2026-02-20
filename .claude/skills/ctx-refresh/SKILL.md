@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # ctx-refresh — Review and refresh stale context
 
 Run the audit to see what's stale:

@@ -6,7 +6,11 @@
  * - A Claude Code slash command (/ctx-setup)
  * - A copy-pasteable prompt for ChatGPT, Cursor, Copilot Chat, etc.
  */
-export const CTX_SETUP_SKILL = `# ctx-setup — Deep Codebase Scan & Context Population
+export const CTX_SETUP_SKILL = `---
+disable-model-invocation: true
+---
+
+# ctx-setup — Deep Codebase Scan & Context Population
 
 You are about to perform a deep scan of this codebase and populate the \`.ctx/\` directory with inferred context. Every value you write is tagged \`[D]\` (derived) so the developer knows it was AI-inferred and should be verified.
 
@@ -17,6 +21,14 @@ Check if \`.ctx/\` directory exists. If not, run:
 \`\`\`bash
 dotctx init --scan
 \`\`\`
+
+## Rules
+
+- **Be thorough but honest**: If you can't determine something, leave it empty rather than guessing.
+- **Tag everything with [D]**: Every value you infer gets the \`[D]\` marker so users know what to verify.
+- **Preserve existing content**: If a .ctx/ file already has human-written content (no \`[D]\` tag), don't overwrite it. Append new derived content below.
+- **Monorepo awareness**: For monorepos, document the workspace structure in architecture.md and note per-package stacks.
+- **Be specific**: Don't write generic advice. Reference actual files, actual patterns, actual terms from this specific codebase.
 
 ## Step 2: Read key project files
 
@@ -208,14 +220,6 @@ Populated:
 All values tagged [D] are AI-derived. Review and verify them.
 Next: Edit any [D] values that need correction, then run \`dotctx compile --target all\`.
 \`\`\`
-
-## Important notes
-
-- **Be thorough but honest**: If you can't determine something, leave it empty rather than guessing.
-- **Tag everything with [D]**: Every value you infer gets the \`[D]\` marker so users know what to verify.
-- **Preserve existing content**: If a .ctx/ file already has human-written content (no \`[D]\` tag), don't overwrite it. Append new derived content below.
-- **Monorepo awareness**: For monorepos, document the workspace structure in architecture.md and note per-package stacks.
-- **Be specific**: Don't write generic advice. Reference actual files, actual patterns, actual terms from this specific codebase.
 `;
 
 /**
@@ -228,11 +232,24 @@ Next: Edit any [D] values that need correction, then run \`dotctx compile --targ
  * 6 stages: Triage → Scope → Plan → Build → Verify → Close
  * 3 tiers: quick / standard / deep (classified dynamically by preflight output)
  */
-export const CTX_WORK_SKILL = `# ctx-work — Context-aware development workflow
+export const CTX_WORK_SKILL = `---
+argument-hint: <task description>
+---
+
+# ctx-work — Context-aware development workflow
 
 You are about to work on a task using structured, context-aware development. This workflow uses dotctx to inject project-specific warnings, conventions, and dependencies at every stage — so you never miss a landmine, break a ripple, or violate a convention.
 
 **Task:** $ARGUMENTS
+
+## Rules
+
+- **Trust the hooks** — landmine guard and ripple check fire automatically. Don't duplicate their work.
+- **Respect the tier** — don't over-engineer a quick fix or under-verify a deep change.
+- **Conventions are constraints** — anti-patterns and AI failure modes from .ctx/conventions.md are things you MUST avoid, not suggestions.
+- **Landmines are sacred** — if preflight or the landmine guard warns about a file, read the landmine entry before touching it.
+- **Continue tasks** — if the task mentions "continue" or current.yaml shows related work, read session history for continuity.
+- **When in doubt, tier up** — it's better to over-verify than to miss a ripple effect.
 
 ---
 
@@ -246,6 +263,7 @@ dotctx preflight --task "$ARGUMENTS"
 
 **Classify the task tier based on preflight output:**
 
+<tier-signals>
 | Signal | Quick | Standard | Deep |
 |--------|-------|----------|------|
 | Landmines found | 0 | 1–2 | 3+ |
@@ -253,6 +271,7 @@ dotctx preflight --task "$ARGUMENTS"
 | Constraining decisions | 0 | 1–2 | 3+ |
 | Files likely touched | 1–2 | 3–5 | 6+ |
 | Open loops related | 0 | 0–1 | 2+ |
+</tier-signals>
 
 **Use the highest tier triggered by any signal.** If unsure, go one tier up.
 
@@ -374,48 +393,12 @@ Verify proportional to the tier.
 Re-read the modified file(s) to confirm correctness. Check for obvious issues.
 
 ### Standard
-Run the project's test suite:
+Run the project's test suite using its package manager (check for \`bun.lockb\`, \`pnpm-lock.yaml\`, \`yarn.lock\`, or \`package-lock.json\` to determine the runner).
 
-\`\`\`bash
-npm test
-\`\`\`
-
-If tests fail, fix them before proceeding. If the project uses TypeScript, also run:
-
-\`\`\`bash
-npx tsc --noEmit
-\`\`\`
+If tests fail, fix them before proceeding. If the project uses TypeScript, also run \`tsc --noEmit\` via the package runner.
 
 ### Deep
-Everything from Standard, plus:
-
-1. **Ripple verification** — For each file in the ripple map that your changes affect, verify the downstream files still work correctly:
-   \`\`\`bash
-   dotctx preflight --task "verify ripple effects of changes to [files changed]"
-   \`\`\`
-
-2. **Full test suite** — Run the complete test suite, not just related tests:
-   \`\`\`bash
-   npm test
-   \`\`\`
-
-3. **Type check** — Verify no type errors were introduced:
-   \`\`\`bash
-   npx tsc --noEmit
-   \`\`\`
-
-4. **Lint** (if available):
-   \`\`\`bash
-   npm run lint 2>/dev/null || true
-   \`\`\`
-
-Report verification results clearly:
-\`\`\`
-Verification:
-  Tests: [pass/fail]
-  Types: [pass/fail]
-  Ripple check: [clean/issues found]
-\`\`\`
+Everything from Standard, plus full verification. Read \`deep-verify.md\` for detailed procedures including ripple verification, full test suite, type checking, and lint.
 
 ---
 
@@ -436,6 +419,65 @@ dotctx push --sync
 If preflight showed stale context warnings, consider running \`/ctx-refresh\` after syncing.
 
 ### Deep
+Record everything for the next session. Read \`deep-close.md\` for full close procedures including recording decisions, marking landmines, resolving loops, syncing state, and running audit.
+
+---
+
+## Summary
+
+Print a brief summary of what was done:
+
+<summary-template>
+✓ ctx-work complete
+
+Task: $ARGUMENTS
+Tier: [quick|standard|deep]
+
+Changes:
+  [list of files modified with brief description]
+
+[If standard/deep:]
+Verification: [pass/fail summary]
+
+[If deep:]
+Recorded: [N decisions, N landmines, N loops resolved, N loops added]
+</summary-template>
+`;
+
+/**
+ * Deep tier verification procedures — loaded on-demand when ctx-work
+ * classifies a task as Deep tier. Saves ~300 tokens on Quick/Standard.
+ */
+export const CTX_WORK_DEEP_VERIFY = `# Deep Tier — Stage 5: Verification
+
+Everything from Standard tier, plus:
+
+1. **Ripple verification** — For each file in the ripple map that your changes affect, verify the downstream files still work correctly:
+   \`\`\`bash
+   dotctx preflight --task "verify ripple effects of changes to [files changed]"
+   \`\`\`
+
+2. **Full test suite** — Run the complete test suite (not just related tests) using the project's package manager.
+
+3. **Type check** — Verify no type errors were introduced by running \`tsc --noEmit\` via the package runner.
+
+4. **Lint** (if available) — Run the project's lint command. Skip gracefully if no lint script exists.
+
+Report verification results clearly:
+\`\`\`
+Verification:
+  Tests: [pass/fail]
+  Types: [pass/fail]
+  Ripple check: [clean/issues found]
+\`\`\`
+`;
+
+/**
+ * Deep tier close procedures — loaded on-demand when ctx-work
+ * classifies a task as Deep tier. Saves ~400 tokens on Quick/Standard.
+ */
+export const CTX_WORK_DEEP_CLOSE = `# Deep Tier — Stage 6: Close
+
 Record everything for the next session:
 
 1. **Record new decisions** made during implementation:
@@ -474,39 +516,6 @@ Record everything for the next session:
    \`\`\`
    If any files are flagged as stale and your task touched related areas, review and update them now.
    Use dotctx mutation commands for structured updates, or edit markdown files directly for architecture/conventions.
-
----
-
-## Summary
-
-Print a brief summary of what was done:
-
-\`\`\`
-✓ ctx-work complete
-
-Task: $ARGUMENTS
-Tier: [quick|standard|deep]
-
-Changes:
-  [list of files modified with brief description]
-
-[If standard/deep:]
-Verification: [pass/fail summary]
-
-[If deep:]
-Recorded: [N decisions, N landmines, N loops resolved, N loops added]
-\`\`\`
-
----
-
-## Important notes
-
-- **Trust the hooks** — landmine guard and ripple check fire automatically. Don't duplicate their work.
-- **Respect the tier** — don't over-engineer a quick fix or under-verify a deep change.
-- **Conventions are constraints** — anti-patterns and AI failure modes from .ctx/conventions.md are things you MUST avoid, not suggestions.
-- **Landmines are sacred** — if preflight or the landmine guard warns about a file, read the landmine entry before touching it.
-- **Continue tasks** — if the task mentions "continue" or current.yaml shows related work, read session history for continuity.
-- **When in doubt, tier up** — it's better to over-verify than to miss a ripple effect.
 `;
 
 /**
@@ -515,7 +524,11 @@ Recorded: [N decisions, N landmines, N loops resolved, N loops added]
  *
  * Designed for Claude Code slash command (/ctx-refresh).
  */
-export const CTX_REFRESH_SKILL = `# ctx-refresh — Review and refresh stale context
+export const CTX_REFRESH_SKILL = `---
+disable-model-invocation: true
+---
+
+# ctx-refresh — Review and refresh stale context
 
 Run the audit to see what's stale:
 

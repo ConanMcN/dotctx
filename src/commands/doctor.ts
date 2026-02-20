@@ -32,9 +32,9 @@ const CLAUDE_HOOKS = [
 ];
 
 const SKILLS = [
-  'ctx-setup.md',
-  'ctx-work.md',
-  'ctx-refresh.md',
+  'ctx-setup',
+  'ctx-work',
+  'ctx-refresh',
 ];
 
 const ADAPTERS: { target: string; output: string }[] = [
@@ -134,21 +134,42 @@ function checkCursorHooks(cwd: string): Check {
 }
 
 function checkSkills(cwd: string): Check {
-  const skillDir = path.join(cwd, '.claude', 'commands');
-  if (!fs.existsSync(skillDir)) {
-    return { label: 'Skills', status: 'fail', detail: 'No .claude/commands/ directory. Run `dotctx init`' };
+  const skillsDir = path.join(cwd, '.claude', 'skills');
+  const legacyDir = path.join(cwd, '.claude', 'commands');
+
+  // Check modern .claude/skills/ first, fall back to legacy .claude/commands/
+  const useModern = fs.existsSync(skillsDir);
+  const useLegacy = !useModern && fs.existsSync(legacyDir);
+
+  if (!useModern && !useLegacy) {
+    return { label: 'Skills', status: 'fail', detail: 'No .claude/skills/ directory. Run `dotctx init`' };
   }
 
-  const installed = SKILLS.filter(s => fs.existsSync(path.join(skillDir, s)));
-  const missing = SKILLS.filter(s => !fs.existsSync(path.join(skillDir, s)));
+  const installed = SKILLS.filter(s =>
+    (useModern && fs.existsSync(path.join(skillsDir, s, 'SKILL.md'))) ||
+    (useLegacy && fs.existsSync(path.join(legacyDir, `${s}.md`)))
+  );
+  const missing = SKILLS.filter(s =>
+    !(useModern && fs.existsSync(path.join(skillsDir, s, 'SKILL.md'))) &&
+    !(useLegacy && fs.existsSync(path.join(legacyDir, `${s}.md`)))
+  );
 
   if (missing.length > 0) {
     return {
       label: `Skills (${installed.length}/${SKILLS.length})`,
       status: 'warn',
-      detail: `Missing: ${missing.map(s => `/${s.replace('.md', '')}`).join(', ')}. Run \`dotctx skill install\``,
+      detail: `Missing: ${missing.map(s => `/${s}`).join(', ')}. Run \`dotctx skill install\``,
     };
   }
+
+  if (useLegacy) {
+    return {
+      label: `Skills (${installed.length}/${SKILLS.length})`,
+      status: 'warn',
+      detail: 'Using legacy .claude/commands/ format. Run `dotctx upgrade` to migrate to .claude/skills/',
+    };
+  }
+
   return { label: `Skills (${installed.length}/${SKILLS.length})`, status: 'pass' };
 }
 

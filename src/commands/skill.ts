@@ -2,26 +2,31 @@ import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
-import { CTX_SETUP_SKILL, CTX_WORK_SKILL, CTX_REFRESH_SKILL } from '../templates/skill.js';
+import { CTX_SETUP_SKILL, CTX_WORK_SKILL, CTX_WORK_DEEP_VERIFY, CTX_WORK_DEEP_CLOSE, CTX_REFRESH_SKILL } from '../templates/skill.js';
 
-const SKILLS: { filename: string; content: string; description: string }[] = [
-  { filename: 'ctx-setup.md', content: CTX_SETUP_SKILL, description: 'Deep codebase scan to populate .ctx/ files' },
-  { filename: 'ctx-work.md', content: CTX_WORK_SKILL, description: 'Context-aware development workflow' },
-  { filename: 'ctx-refresh.md', content: CTX_REFRESH_SKILL, description: 'Review and refresh stale context files' },
+const SKILLS: { name: string; files: { filename: string; content: string }[]; description: string }[] = [
+  { name: 'ctx-setup', files: [{ filename: 'SKILL.md', content: CTX_SETUP_SKILL }], description: 'Deep codebase scan to populate .ctx/ files' },
+  { name: 'ctx-work', files: [
+    { filename: 'SKILL.md', content: CTX_WORK_SKILL },
+    { filename: 'deep-verify.md', content: CTX_WORK_DEEP_VERIFY },
+    { filename: 'deep-close.md', content: CTX_WORK_DEEP_CLOSE },
+  ], description: 'Context-aware development workflow' },
+  { name: 'ctx-refresh', files: [{ filename: 'SKILL.md', content: CTX_REFRESH_SKILL }], description: 'Review and refresh stale context files' },
 ];
 
-function getSkillDir(cwd: string): string {
-  return path.join(cwd, '.claude', 'commands');
-}
-
 function installSkills(cwd: string): string[] {
-  const skillDir = getSkillDir(cwd);
-  fs.mkdirSync(skillDir, { recursive: true });
-  return SKILLS.map(({ filename, content }) => {
-    const p = path.join(skillDir, filename);
-    fs.writeFileSync(p, content, 'utf-8');
-    return p;
-  });
+  const skillsDir = path.join(cwd, '.claude', 'skills');
+  const installed: string[] = [];
+  for (const { name, files } of SKILLS) {
+    const skillDir = path.join(skillsDir, name);
+    fs.mkdirSync(skillDir, { recursive: true });
+    for (const { filename, content } of files) {
+      const p = path.join(skillDir, filename);
+      fs.writeFileSync(p, content, 'utf-8');
+      installed.push(p);
+    }
+  }
+  return installed;
 }
 
 export function installSkillsDuringInit(cwd: string): string[] | null {
@@ -49,13 +54,12 @@ export function registerSkill(program: Command): void {
 
       console.log(pc.green('✓ Skills installed'));
       console.log('');
-      console.log(`  ${pc.dim('.claude/commands/')}`);
-      for (const { filename, description } of SKILLS) {
-        const name = filename.replace('.md', '');
+      console.log(`  ${pc.dim('.claude/skills/')}`);
+      for (const { name, description } of SKILLS) {
         console.log(`    ${pc.cyan(`/${name}`)}  — ${description}`);
       }
       console.log('');
       console.log(`  Use these slash commands in Claude Code.`);
-      console.log(`  Or copy the file contents into ChatGPT, Cursor, or Copilot Chat.`);
+      console.log(`  Or copy the SKILL.md contents into ChatGPT, Cursor, or Copilot Chat.`);
     });
 }

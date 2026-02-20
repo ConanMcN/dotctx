@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # ctx-setup — Deep Codebase Scan & Context Population
 
 You are about to perform a deep scan of this codebase and populate the `.ctx/` directory with inferred context. Every value you write is tagged `[D]` (derived) so the developer knows it was AI-inferred and should be verified.
@@ -9,6 +13,14 @@ Check if `.ctx/` directory exists. If not, run:
 ```bash
 dotctx init --scan
 ```
+
+## Rules
+
+- **Be thorough but honest**: If you can't determine something, leave it empty rather than guessing.
+- **Tag everything with [D]**: Every value you infer gets the `[D]` marker so users know what to verify.
+- **Preserve existing content**: If a .ctx/ file already has human-written content (no `[D]` tag), don't overwrite it. Append new derived content below.
+- **Monorepo awareness**: For monorepos, document the workspace structure in architecture.md and note per-package stacks.
+- **Be specific**: Don't write generic advice. Reference actual files, actual patterns, actual terms from this specific codebase.
 
 ## Step 2: Read key project files
 
@@ -200,11 +212,3 @@ Populated:
 All values tagged [D] are AI-derived. Review and verify them.
 Next: Edit any [D] values that need correction, then run `dotctx compile --target all`.
 ```
-
-## Important notes
-
-- **Be thorough but honest**: If you can't determine something, leave it empty rather than guessing.
-- **Tag everything with [D]**: Every value you infer gets the `[D]` marker so users know what to verify.
-- **Preserve existing content**: If a .ctx/ file already has human-written content (no `[D]` tag), don't overwrite it. Append new derived content below.
-- **Monorepo awareness**: For monorepos, document the workspace structure in architecture.md and note per-package stacks.
-- **Be specific**: Don't write generic advice. Reference actual files, actual patterns, actual terms from this specific codebase.
