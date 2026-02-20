@@ -1,0 +1,17 @@
+id: 2026-02-19T17-45-43
+date: '2026-02-19'
+summary: 'Commits: 5eea11c feat: add dotctx audit command for context staleness detection; 00efeb2 feat: add /ctx-work context-aware development workflow skill; 6b48abb feat: add 3 new Claude Code hooks, check command, push --sync, and enhanced preflight'
+state: in-progress
+next_step: ''
+files_touched:
+  - .claude/commands/ctx-work.md
+  - .ctx/architecture.md
+  - .ctx/conventions.md
+  - .ctx/current.yaml
+  - .ctx/decisions.md
+  - .ctx/vocabulary.md
+  - .cursorrules
+  - .github/copilot-instructions.md
+  - CLAUDE.md
+  - package-lock.json
+  - package.json

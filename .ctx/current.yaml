@@ -4,29 +4,13 @@ state: in-progress
 next_step: ''
 blocked_by: ''
 files_touched:
-  - claude/hooks/dotctx-preflight.sh
-  - .ctx/architecture.md
-  - .ctx/capsule.md
-  - .ctx/conventions.md
-  - .ctx/current.yaml
-  - .ctx/decisions.md
-  - .ctx/resume.txt
-  - .ctx/vocabulary.md
+  - ctx/current.yaml
   - .cursorrules
   - .github/copilot-instructions.md
   - CLAUDE.md
-  - README.md
-  - src/bin.ts
-  - src/commands/preflight.ts
-  - src/core/adapters/claude.ts
-  - src/core/adapters/copilot.ts
-  - src/core/adapters/cursor.ts
-  - src/core/preflight.ts
-  - src/index.ts
-  - src/mcp/tools.ts
-  - src/utils/claude-hooks.ts
+  - package-lock.json
   - .ctx/sessions/2026-02-19T17-45-43.yaml
   - .ctx/sessions/2026-02-19T17-46-48.yaml
   - .ctx/sessions/2026-02-19T17-47-22.yaml
-  - src/commands/doctor.ts
+  - .ctx/sessions/2026-02-20T16-43-01.yaml
 updated_at: '2026-02-20'

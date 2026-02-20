@@ -4,7 +4,7 @@
 Branch: main
 Task: Add /ctx-work skill and multi-skill refactor
 State: in-progress
-Files: claude/hooks/dotctx-preflight.sh, .ctx/architecture.md, .ctx/capsule.md, .ctx/conventions.md, .ctx/current.yaml, .ctx/decisions.md, .ctx/resume.txt, .ctx/vocabulary.md, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, README.md, src/bin.ts, src/commands/preflight.ts, src/core/adapters/claude.ts, src/core/adapters/copilot.ts, src/core/adapters/cursor.ts, src/core/preflight.ts, src/index.ts, src/mcp/tools.ts, src/utils/claude-hooks.ts, .ctx/sessions/2026-02-19T17-45-43.yaml, .ctx/sessions/2026-02-19T17-46-48.yaml, .ctx/sessions/2026-02-19T17-47-22.yaml, src/commands/doctor.ts
+Files: package-lock.json
 
 ## Landmines
 - [D] `console.error` instead of `console.log` in serve command (src/commands/serve.ts:10) — [D] MCP server uses stdout for stdio transport — any console.log would corrupt the protocol
@@ -192,7 +192,7 @@ Mutation flow:
 - **ctx-refresh**: The /ctx-refresh slash command — guides AI through reviewing and updating stale .ctx/ files flagged by audit — NOT a CLI command
 
 ## Session Log
-Last session (2026-02-19): Commits: e9b7354 chore: bump to 0.5.0; 79b1ee6 chore: recompile adapter outputs and update .ctx/ files; 5eea11c feat: add dotctx audit command for context staleness detection
+Last session (2026-02-20): Commits: 25b2201 feat: add doctor command and preflight --brief mode; e9b7354 chore: bump to 0.5.0; 79b1ee6 chore: recompile adapter outputs and update .ctx/ files
 
 # AI Context Bootstrap
 
@@ -206,17 +206,3 @@ To record a decision: `dotctx decide "choice" --over "alternatives" --why "reaso
 To mark intentional weirdness: `dotctx landmine "description" --file path:line`
 
 Always check landmines before modifying code that looks wrong — it may be intentional.
-
-## Development Workflow
-
-Follow this posture automatically for every coding task — no need to invoke `/ctx-work` unless you want full ceremony:
-
-1. **Read preflight output** (auto-injected each prompt) — respect all landmines and constraining decisions shown
-2. **Conventions are hard constraints** — anti-patterns and AI failure modes listed above are things you MUST avoid, not suggestions
-3. **Plan before multi-file changes** — if your changes affect 3+ files, state your approach before implementing
-4. **Landmines are sacred** — if preflight warns about a file, or code looks wrong, check landmines before "fixing" it
-5. **Verify after implementation** — run the project's test suite and type-checker before considering work done
-6. **Record what you learned** — new architectural choices: `dotctx decide`; intentional oddities: `dotctx landmine`
-7. **Stale context warnings are informational** — note them but don't block work; suggest `/ctx-refresh` if relevant
-
-For detailed 6-stage workflow with tiered verification: `/ctx-work <task>`
