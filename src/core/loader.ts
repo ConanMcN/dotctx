@@ -97,11 +97,13 @@ function parseLandmines(content: string): Landmine[] {
     if (!line.startsWith('|') || line.includes('---') || line.toLowerCase().includes('description')) continue;
     const cells = line.split('|').map(c => c.trim()).filter(Boolean);
     if (cells.length >= 2) {
+      const severity = cells[4]?.toLowerCase();
       landmines.push({
         description: cells[0],
         file: cells[1] || '',
         why: cells[2] || '',
         date: cells[3] || '',
+        severity: severity === 'critical' || severity === 'info' ? severity : 'warning',
       });
     }
   }
@@ -112,7 +114,7 @@ function parseLandmines(content: string): Landmine[] {
       const parts = match[1].split('—').map(s => s.trim());
       landmines.push({
         description: parts[0],
-        file: '', why: parts[1] || '', date: '',
+        file: '', why: parts[1] || '', date: '', severity: 'warning',
       });
     }
   }

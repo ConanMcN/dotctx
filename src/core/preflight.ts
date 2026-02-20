@@ -3,6 +3,7 @@ import { CLI_NAME } from '../constants.js';
 import { getExpiredLoops, parseDuration } from './freshness.js';
 import { isGitRepo, getGitBranch } from '../utils/git.js';
 import { getStaleFileWarnings } from './audit.js';
+import { countTokens } from '../utils/tokens.js';
 
 function extractKeywords(text: string): string[] {
   return text
@@ -123,10 +124,16 @@ export function generatePreflight(ctx: CtxData, task: string, ctxDirOrOpts?: str
   }
 
   if (landmines.length) {
+    // Sort by severity: critical → warning → info
+    const severityOrder = { critical: 0, warning: 1, info: 2 };
+    const sorted = [...landmines].sort((a, b) =>
+      (severityOrder[a.severity ?? 'warning'] ?? 1) - (severityOrder[b.severity ?? 'warning'] ?? 1)
+    );
     lines.push('## Landmines');
     lines.push('> These look wrong but are intentional — DO NOT change');
-    for (const l of landmines) {
-      lines.push(`  - ${l.description}${l.file ? ` (${l.file})` : ''}${l.why ? ` — ${l.why}` : ''}`);
+    for (const l of sorted) {
+      const tag = l.severity === 'critical' ? '🔴 ' : l.severity === 'info' ? 'ℹ️ ' : '';
+      lines.push(`  - ${tag}${l.description}${l.file ? ` (${l.file})` : ''}${l.why ? ` — ${l.why}` : ''}`);
     }
     lines.push('');
   }
@@ -158,7 +165,15 @@ export function generatePreflight(ctx: CtxData, task: string, ctxDirOrOpts?: str
     }
   }
 
-  if (!landmines.length && !decisions.length && !rippleMap.length && !openLoops.length) {
+  const hasMatches = landmines.length > 0 || decisions.length > 0 || rippleMap.length > 0 || openLoops.length > 0;
+
+  if (!hasMatches && !healthWarnings.length) {
+    // Lighter output when nothing is relevant
+    const formatted = `# Preflight: ${task}\nNo warnings. Proceed.`;
+    return { landmines, decisions, rippleMap, openLoops, formatted };
+  }
+
+  if (!hasMatches) {
     lines.push('No specific warnings found for this task. Proceed with standard practices.');
     lines.push('');
   }
@@ -166,11 +181,15 @@ export function generatePreflight(ctx: CtxData, task: string, ctxDirOrOpts?: str
   lines.push('---');
   lines.push(`Run \`${CLI_NAME} pull --task "..." \` for full context capsule.`);
 
+  const formatted = lines.join('\n');
+  const tokens = countTokens(formatted);
+  const finalFormatted = `${formatted}\n\nContext: ~${tokens} tokens`;
+
   return {
     landmines,
     decisions,
     rippleMap,
     openLoops,
-    formatted: lines.join('\n'),
+    formatted: finalFormatted,
   };
 }

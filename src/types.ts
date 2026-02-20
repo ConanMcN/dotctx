@@ -43,6 +43,7 @@ export const landmineSchema = z.object({
   file: z.string().default(''),
   why: z.string().default(''),
   date: z.string(),
+  severity: z.enum(['critical', 'warning', 'info']).default('warning'),
 });
 
 export const vocabEntrySchema = z.object({

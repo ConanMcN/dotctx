@@ -12,6 +12,7 @@ export function registerLandmine(program: Command): void {
     .description('Mark something as intentionally weird — DO NOT change')
     .option('--file <path>', 'File path and optional line number (e.g., src/auth.ts:42)')
     .option('--why <reason>', 'Why it is intentional')
+    .option('--severity <level>', 'Severity: critical, warning (default), info')
     .option('--no-compile', 'Skip auto-compile after recording')
     .action((description, opts) => {
       const ctxDir = findCtxDir();
@@ -21,7 +22,8 @@ export function registerLandmine(program: Command): void {
       }
 
       const date = new Date().toISOString().split('T')[0];
-      const row = `| ${description} | ${opts.file || ''} | ${opts.why || ''} | ${date} |`;
+      const severity = opts.severity || 'warning';
+      const row = `| ${description} | ${opts.file || ''} | ${opts.why || ''} | ${date} | ${severity} |`;
       appendToFile(path.join(ctxDir, 'landmines.md'), row);
 
       console.log(pc.green(`✓ Landmine marked: ${description}`));

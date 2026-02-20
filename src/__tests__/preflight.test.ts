@@ -58,20 +58,26 @@ describe('generatePreflight', () => {
 
   it('generates header with task name', () => {
     const result = generatePreflight(makeCtx(), 'fix auth bug');
-    expect(result.formatted).toContain('# Preflight Checklist: fix auth bug');
+    expect(result.formatted).toContain('Preflight');
+    expect(result.formatted).toContain('fix auth bug');
   });
 
-  it('shows "no warnings" when nothing matches', () => {
+  it('shows lightweight output when nothing matches', () => {
     const result = generatePreflight(makeCtx(), 'completely unrelated task');
-    expect(result.formatted).toContain('No specific warnings found');
+    expect(result.formatted).toContain('No warnings. Proceed.');
     expect(result.landmines).toHaveLength(0);
     expect(result.decisions).toHaveLength(0);
     expect(result.rippleMap).toHaveLength(0);
     expect(result.openLoops).toHaveLength(0);
   });
 
-  it('includes footer with pull command', () => {
-    const result = generatePreflight(makeCtx(), 'some task');
+  it('includes footer with pull command when matches exist', () => {
+    const ctx = makeCtx({
+      landmines: [
+        { description: 'console.error in MCP server', file: 'src/mcp/server.ts', why: 'stdio transport', date: '2026-01-01' },
+      ],
+    });
+    const result = generatePreflight(ctx, 'MCP server');
     expect(result.formatted).toContain('dotctx pull --task');
   });
 

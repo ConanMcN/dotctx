@@ -19,6 +19,8 @@ import { registerUpgrade } from './commands/upgrade.js';
 import { registerCheck } from './commands/check.js';
 import { registerAudit } from './commands/audit.js';
 import { registerDoctor } from './commands/doctor.js';
+import { registerWhy } from './commands/why.js';
+import { registerDiff } from './commands/diff.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json');
@@ -48,5 +50,7 @@ registerUpgrade(program);
 registerCheck(program);
 registerAudit(program);
 registerDoctor(program);
+registerWhy(program);
+registerDiff(program);
 
 program.parse();

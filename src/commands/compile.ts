@@ -4,6 +4,7 @@ import path from 'node:path';
 import pc from 'picocolors';
 import { loadContext, findCtxDir } from '../core/loader.js';
 import { getAdapter, getAllAdapters } from '../core/adapters/index.js';
+import { countTokens } from '../utils/tokens.js';
 import { NO_CTX_DIR_MSG } from '../constants.js';
 
 export function registerCompile(program: Command): void {
@@ -41,7 +42,8 @@ export function registerCompile(program: Command): void {
           const outputDir = path.dirname(outputPath);
           fs.mkdirSync(outputDir, { recursive: true });
           fs.writeFileSync(outputPath, output, 'utf-8');
-          console.log(pc.green(`✓ ${adapter.name} → ${adapter.outputPath}`));
+          const tokens = countTokens(output);
+          console.log(pc.green(`✓ ${adapter.name} → ${adapter.outputPath}`) + pc.dim(` (~${tokens} tokens)`));
         }
       }
     });
