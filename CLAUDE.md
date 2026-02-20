@@ -4,12 +4,13 @@
 Branch: main
 Task: Add /ctx-work skill and multi-skill refactor
 State: in-progress
+Files: ctx/current.yaml, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, .ctx/sessions/2026-02-20T17-27-11.yaml, .ctx/sessions/2026-02-20T17-30-16.yaml, .ctx/sessions/2026-02-20T17-36-55.yaml
 
 ## Landmines
 - [D] `console.error` instead of `console.log` in serve command (src/commands/serve.ts:10) — [D] MCP server uses stdout for stdio transport — any console.log would corrupt the protocol
 - [D] `extractKeywords` function duplicated in capsule.ts and preflight.ts (src/core/capsule.ts:6, src/core/preflight.ts:3) — [D] Intentional — these modules are independent and may diverge; extracting a shared util would create coupling
 - [D] `tokenizer.ts` re-exports from `utils/tokens.ts` (src/core/tokenizer.ts) — [D] Part of the public core API surface — provides `allocateBudget()` alongside re-exported token utils
-- MCP server version hardcoded to `0.1.0` (differs from package version) (src/mcp/server.ts:15) — MCP protocol version is intentionally decoupled from package version — MCP spec version, not release version
+- MCP server version hardcoded to `0.1.0` (differs from package version) (src/mcp/server.ts:23) — MCP protocol version is intentionally decoupled from package version — MCP spec version, not release version
 - `autoCompile` uses `{ silent: true }` in MCP tools but not in CLI commands (src/mcp/tools.ts) — MCP uses stdio — compile output would corrupt the protocol; CLI commands should show user feedback
 - Hook scripts always `exit 0` even on failure (src/utils/claude-hooks.ts, src/utils/cursor-hooks.ts) — Hooks must never block the user — a failed preflight is better than a blocked prompt
 - Claude hook settings use absolute path for command (src/utils/claude-hooks.ts) — Claude Code resolves hook commands from project root — absolute path ensures it works regardless of cwd
@@ -191,7 +192,7 @@ Mutation flow:
 - **ctx-refresh**: The /ctx-refresh slash command — guides AI through reviewing and updating stale .ctx/ files flagged by audit — NOT a CLI command
 
 ## Session Log
-Last session (2026-02-20): Commits: 8a26000 chore: update .ctx/ session files and recompile adapter outputs; 25b2201 feat: add doctor command and preflight --brief mode; e9b7354 chore: bump to 0.5.0
+Last session (2026-02-20): Commits: 18e04aa chore: clean up stale changesets and add 0.6.1 changeset; 6b631c5 chore: bump to 0.6.1; c7895b4 test: add preflight and loader unit tests
 
 # AI Context Bootstrap
 
@@ -205,3 +206,17 @@ To record a decision: `dotctx decide "choice" --over "alternatives" --why "reaso
 To mark intentional weirdness: `dotctx landmine "description" --file path:line`
 
 Always check landmines before modifying code that looks wrong — it may be intentional.
+
+## Development Workflow
+
+Follow this posture automatically for every coding task — no need to invoke `/ctx-work` unless you want full ceremony:
+
+1. **Read preflight output** (auto-injected each prompt) — respect all landmines and constraining decisions shown
+2. **Conventions are hard constraints** — anti-patterns and AI failure modes listed above are things you MUST avoid, not suggestions
+3. **Plan before multi-file changes** — if your changes affect 3+ files, state your approach before implementing
+4. **Landmines are sacred** — if preflight warns about a file, or code looks wrong, check landmines before "fixing" it
+5. **Verify after implementation** — run the project's test suite and type-checker before considering work done
+6. **Record what you learned** — new architectural choices: `dotctx decide`; intentional oddities: `dotctx landmine`
+7. **Stale context warnings are informational** — note them but don't block work; suggest `/ctx-refresh` if relevant
+
+For detailed 6-stage workflow with tiered verification: `/ctx-work <task>`
