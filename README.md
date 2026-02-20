@@ -82,6 +82,31 @@ These are power-user tools for when you want explicit ceremony. Normal developme
 
 Auto-compile keeps your context files in sync — no need to run `dotctx compile` manually after mutations.
 
+### Session lifecycle
+
+After one-time setup (`dotctx init --scan`), hooks handle context injection automatically across the full session lifecycle:
+
+**Starting a session:**
+- Claude Code: the `UserPromptSubmit` hook runs `dotctx preflight` on your first prompt, injecting relevant landmines, decisions, and ripple effects
+- Cursor: the `sessionStart` hook generates a full context capsule and injects it via `additional_context`
+- The compiled output file (CLAUDE.md / .cursorrules) is already loaded as system-level context
+- Optional: `/ctx-work <task>` for a structured 6-stage workflow, or `dotctx pull --task "..."` for a manual capsule
+
+**Mid-session:**
+- Every prompt re-runs preflight with the new prompt text, so context stays task-relevant as the conversation shifts (`--brief` for questions)
+- Before file edits: landmine guard checks the target file and injects warnings
+- After file edits: ripple check shows downstream files that might be affected
+- After commits: `push --auto` records a session note, `compile --target all` refreshes adapter outputs
+- After branch switches: `push --sync` updates current.yaml
+- Manual as needed: `dotctx decide ...` / `landmine ...` / `vocab ...` / `loop add ...`
+
+**Ending a session:**
+- Claude Code: the `Stop` hook runs `push --sync` to update current.yaml when Claude finishes responding
+- If the last action was a commit, the post-commit hook already created a session note in `.ctx/sessions/`
+- Optional: `dotctx push --auto` to explicitly record a handoff, or `/ctx-work` close stage for full ceremony
+
+All hooks exit 0 and never block your workflow. Use `dotctx doctor` to verify everything is installed correctly.
+
 ## `.ctx/` directory
 
 ```
