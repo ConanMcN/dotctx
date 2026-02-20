@@ -4,7 +4,7 @@
 Branch: main
 Task: Add /ctx-work skill and multi-skill refactor
 State: in-progress
-Files: .claude/commands/ctx-work.md, .ctx/architecture.md, .ctx/conventions.md, .ctx/current.yaml, .ctx/decisions.md, .ctx/vocabulary.md, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, package-lock.json, package.json
+Files: claude/hooks/dotctx-preflight.sh, .ctx/architecture.md, .ctx/capsule.md, .ctx/conventions.md, .ctx/current.yaml, .ctx/decisions.md, .ctx/resume.txt, .ctx/vocabulary.md, .cursorrules, .github/copilot-instructions.md, CLAUDE.md, README.md, src/bin.ts, src/commands/preflight.ts, src/core/adapters/claude.ts, src/core/adapters/copilot.ts, src/core/adapters/cursor.ts, src/core/preflight.ts, src/index.ts, src/mcp/tools.ts, src/utils/claude-hooks.ts, .ctx/sessions/2026-02-19T17-45-43.yaml, .ctx/sessions/2026-02-19T17-46-48.yaml, .ctx/sessions/2026-02-19T17-47-22.yaml, src/commands/doctor.ts
 
 ## Landmines
 - [D] `console.error` instead of `console.log` in serve command (src/commands/serve.ts:10) — [D] MCP server uses stdout for stdio transport — any console.log would corrupt the protocol
@@ -37,6 +37,9 @@ Files: .claude/commands/ctx-work.md, .ctx/architecture.md, .ctx/conventions.md, 
 - Hook script tries binary → node_modules → npx (over: npx only, direct path only) — Speed optimization — avoids npx overhead when binary is available locally
 - Cursor hooks only install if .cursor/ exists (over: Always install) — Respects user's editor choice — don't create .cursor/ for non-Cursor users
 - Single-file /ctx-work skill with dynamic tiers (over: Separate markdown files per stage, Static workflow without tiers) — dotctx handles filtering/budgeting; tiers adapt depth to actual preflight output; one file is simpler to maintain
+- Git-based file staleness over timestamp files (over: mtime, manual timestamps, .last-updated files) — Zero infrastructure, works with git history, no extra files to track
+- Health section appended outside token budget (over: Inside budget, separate file, separate section) — ~50 tokens fixed cost, too important to truncate, applies to all adapters uniformly
+- Audit is read-only (no mutations) (over: Auto-fix, interactive prompts) — Audit detects and reports; /ctx-refresh guides the fix — separation of concerns
 
 ## Conventions
 # Conventions
@@ -60,6 +63,8 @@ Files: .claude/commands/ctx-work.md, .ctx/architecture.md, .ctx/conventions.md, 
 - Editor hook install: follows `installSkillsDuringInit` pattern — returns `string[] | null`, idempotent, merge-safe with existing config
 - Multi-skill install: `SKILLS` array in `skill.ts` — each skill has filename, content, and description; `installSkills()` writes all in one pass
 - Hook scripts: try direct binary → `node_modules/.bin/` → `npx --yes` (speed optimization, graceful fallback)
+- Health section in autocompile: appended outside token budget system (~50 tokens, fixed size) — only when stale files detected [D]
+- Audit is read-only: `runAudit()` never writes files — detection and reporting only; `/ctx-refresh` guides fixes [D]
 
 ## Anti-patterns
 <!-- [D] Inferred from codebase patterns -->
@@ -98,17 +103,17 @@ Files: .claude/commands/ctx-work.md, .ctx/architecture.md, .ctx/conventions.md, 
 | `src/types.ts` | [D] All Zod schemas, TypeScript types, and interfaces |
 | `src/commands/` | [D] CLI command handlers (one file per command, `register*` pattern) |
 | `src/commands/hooks.ts` | Git hook install/uninstall (post-commit) |
-| `src/core/` | [D] Core logic: compiler, capsule generator, loader, precedence, freshness |
+| `src/core/` | [D] Core logic: compiler, capsule generator, loader, precedence, freshness, audit |
 | `src/core/adapters/` | [D] Output adapters: claude, cursor, copilot, system |
 | `src/mcp/` | [D] MCP server (stdio transport), tools, resources, and prompts |
-| `src/templates/` | [D] Scaffold templates for `init` and skill prompts (ctx-setup, ctx-work) |
+| `src/templates/` | [D] Scaffold templates for `init` and skill prompts (ctx-setup, ctx-work, ctx-refresh) |
 | `src/utils/` | [D] Helpers: git, markdown parsing, token counting, YAML I/O, autocompile, editor hooks |
 | `src/utils/autocompile.ts` | Auto-recompile all adapters after mutation commands |
 | `src/utils/claude-hooks.ts` | Install Claude Code UserPromptSubmit hook during init |
 | `src/utils/cursor-hooks.ts` | Install Cursor sessionStart hook during init |
 | `src/__tests__/` | [D] Vitest unit tests |
 | `.ctx/` | [D] The context directory this tool manages (also used on itself) |
-| `.claude/commands/` | [D] Claude Code slash commands (ctx-setup.md, ctx-work.md skills) |
+| `.claude/commands/` | [D] Claude Code slash commands (ctx-setup.md, ctx-work.md, ctx-refresh.md skills) |
 | `.claude/hooks/` | Claude Code hooks (preflight, post-commit, session-sync, landmine-guard, ripple-check) |
 | `.changeset/` | Changesets config for version management |
 
@@ -131,6 +136,8 @@ Files: .claude/commands/ctx-work.md, .ctx/architecture.md, .ctx/conventions.md, 
 - `src/templates/skill.ts` → `src/commands/skill.ts`, `src/templates/index.ts` [D]
 - `src/utils/claude-hooks.ts` → `src/commands/init.ts`
 - `src/utils/cursor-hooks.ts` → `src/commands/init.ts`
+- `src/core/audit.ts` → `src/utils/autocompile.ts`, `src/core/preflight.ts`, `src/commands/audit.ts`, `src/commands/status.ts`, `src/mcp/tools.ts`, `src/index.ts`
+- `src/utils/git.ts` → `src/core/audit.ts`, `src/core/preflight.ts`
 
 ## Dependency flow
 <!-- [D] Derived from imports and architecture -->
@@ -178,9 +185,14 @@ Mutation flow:
 - **sessionStart**: Cursor hook event that fires when a new session begins — returns JSON with `additional_context` field
 - **skill**: A markdown prompt file installed in `.claude/commands/` as a Claude Code slash command — NOT a programming skill or ability
 - **ctx-work**: The `/ctx-work` slash command — a 6-stage context-aware development workflow (Triage → Scope → Plan → Build → Verify → Close) — NOT a CLI command
+- **audit**: A read-only analysis of .ctx/ file freshness, entry drift, and ripple map coverage — NOT a security audit
+- **context health**: A summary section appended to compiled output showing stale .ctx/ files — only appears when staleness is detected
+- **entry drift**: When a landmine or decision references a source file that has changed since the entry was recorded — signals the entry may need review
+- **file staleness**: Git-based age of a .ctx/ file measured against file_stale_threshold (default 30d) — NOT the same as current.yaml staleness which uses stale_threshold
+- **ctx-refresh**: The /ctx-refresh slash command — guides AI through reviewing and updating stale .ctx/ files flagged by audit — NOT a CLI command
 
 ## Session Log
-Last session (2026-02-19): Commits: 5eea11c feat: add dotctx audit command for context staleness detection; 00efeb2 feat: add /ctx-work context-aware development workflow skill; 6b48abb feat: add 3 new Claude Code hooks, check command, push --sync, and enhanced preflight
+Last session (2026-02-19): Commits: e9b7354 chore: bump to 0.5.0; 79b1ee6 chore: recompile adapter outputs and update .ctx/ files; 5eea11c feat: add dotctx audit command for context staleness detection
 
 # AI Context Bootstrap
 
@@ -194,3 +206,17 @@ To record a decision: `dotctx decide "choice" --over "alternatives" --why "reaso
 To mark intentional weirdness: `dotctx landmine "description" --file path:line`
 
 Always check landmines before modifying code that looks wrong — it may be intentional.
+
+## Development Workflow
+
+Follow this posture automatically for every coding task — no need to invoke `/ctx-work` unless you want full ceremony:
+
+1. **Read preflight output** (auto-injected each prompt) — respect all landmines and constraining decisions shown
+2. **Conventions are hard constraints** — anti-patterns and AI failure modes listed above are things you MUST avoid, not suggestions
+3. **Plan before multi-file changes** — if your changes affect 3+ files, state your approach before implementing
+4. **Landmines are sacred** — if preflight warns about a file, or code looks wrong, check landmines before "fixing" it
+5. **Verify after implementation** — run the project's test suite and type-checker before considering work done
+6. **Record what you learned** — new architectural choices: `dotctx decide`; intentional oddities: `dotctx landmine`
+7. **Stale context warnings are informational** — note them but don't block work; suggest `/ctx-refresh` if relevant
+
+For detailed 6-stage workflow with tiered verification: `/ctx-work <task>`

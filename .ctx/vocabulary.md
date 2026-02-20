@@ -25,3 +25,8 @@
 | skill | A markdown prompt file installed in `.claude/commands/` as a Claude Code slash command — NOT a programming skill or ability |
 | ctx-work | The `/ctx-work` slash command — a 6-stage context-aware development workflow (Triage → Scope → Plan → Build → Verify → Close) — NOT a CLI command |
 | tier (quick/standard/deep) | Task complexity classification determined by preflight output — controls depth of scoping, planning, verification, and close stages |
+| audit | A read-only analysis of .ctx/ file freshness, entry drift, and ripple map coverage — NOT a security audit |
+| context health | A summary section appended to compiled output showing stale .ctx/ files — only appears when staleness is detected |
+| entry drift | When a landmine or decision references a source file that has changed since the entry was recorded — signals the entry may need review |
+| file staleness | Git-based age of a .ctx/ file measured against file_stale_threshold (default 30d) — NOT the same as current.yaml staleness which uses stale_threshold |
+| ctx-refresh | The /ctx-refresh slash command — guides AI through reviewing and updating stale .ctx/ files flagged by audit — NOT a CLI command |

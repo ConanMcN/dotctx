@@ -19,6 +19,8 @@
 - Editor hook install: follows `installSkillsDuringInit` pattern — returns `string[] | null`, idempotent, merge-safe with existing config
 - Multi-skill install: `SKILLS` array in `skill.ts` — each skill has filename, content, and description; `installSkills()` writes all in one pass
 - Hook scripts: try direct binary → `node_modules/.bin/` → `npx --yes` (speed optimization, graceful fallback)
+- Health section in autocompile: appended outside token budget system (~50 tokens, fixed size) — only when stale files detected [D]
+- Audit is read-only: `runAudit()` never writes files — detection and reporting only; `/ctx-refresh` guides fixes [D]
 
 ## Anti-patterns
 <!-- [D] Inferred from codebase patterns -->

@@ -7,6 +7,15 @@ This project uses \`.ctx/\` for structured context.
 **Before starting any coding task**, run: \`dotctx preflight --task "..."\` to check for landmines and constraints.
 For full context: \`dotctx pull --task "..."\`
 Check \`.ctx/landmines.md\` before changing code that looks wrong.
+
+## Development Workflow
+Follow this automatically — no need to invoke /ctx-work unless you want full ceremony:
+1. **Read preflight output** (auto-injected) — respect all landmines and constraining decisions
+2. **Conventions are hard constraints** — anti-patterns listed above are things you MUST avoid
+3. **Plan before multi-file changes** — state your approach if touching 3+ files
+4. **Landmines are sacred** — check before "fixing" code that looks wrong
+5. **Verify** — run tests and type-checker before considering work done
+6. **Record decisions** — \`dotctx decide\` for choices; \`dotctx landmine\` for intentional oddities
 `.trim();
 
 export function compileForCopilot(ctx: CtxData, budget?: number): string {

@@ -1,3 +1,3 @@
-Working on: Auto-install editor hooks during dotctx init. State: in-progress. 7 landmine(s) — check .ctx/landmines.md. Last session: Commits: a45fefb fix: use new Claude Code hooks format with nested matcher groups; cf8aa73 chore: bump to 0.2.5; 776688c docs: add
+Working on: Add /ctx-work skill and multi-skill refactor. State: in-progress. 7 landmine(s) — check .ctx/landmines.md. Last session: Commits: e9b7354 chore: bump to 0.5.0; 79b1ee6 chore: recompile adapter outputs and update .ctx/ files; 5eea11c feat: add dotctx audit command
 
 [...truncated to fit budget]

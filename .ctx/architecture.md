@@ -9,17 +9,17 @@
 | `src/types.ts` | [D] All Zod schemas, TypeScript types, and interfaces |
 | `src/commands/` | [D] CLI command handlers (one file per command, `register*` pattern) |
 | `src/commands/hooks.ts` | Git hook install/uninstall (post-commit) |
-| `src/core/` | [D] Core logic: compiler, capsule generator, loader, precedence, freshness |
+| `src/core/` | [D] Core logic: compiler, capsule generator, loader, precedence, freshness, audit |
 | `src/core/adapters/` | [D] Output adapters: claude, cursor, copilot, system |
 | `src/mcp/` | [D] MCP server (stdio transport), tools, resources, and prompts |
-| `src/templates/` | [D] Scaffold templates for `init` and skill prompts (ctx-setup, ctx-work) |
+| `src/templates/` | [D] Scaffold templates for `init` and skill prompts (ctx-setup, ctx-work, ctx-refresh) |
 | `src/utils/` | [D] Helpers: git, markdown parsing, token counting, YAML I/O, autocompile, editor hooks |
 | `src/utils/autocompile.ts` | Auto-recompile all adapters after mutation commands |
 | `src/utils/claude-hooks.ts` | Install Claude Code UserPromptSubmit hook during init |
 | `src/utils/cursor-hooks.ts` | Install Cursor sessionStart hook during init |
 | `src/__tests__/` | [D] Vitest unit tests |
 | `.ctx/` | [D] The context directory this tool manages (also used on itself) |
-| `.claude/commands/` | [D] Claude Code slash commands (ctx-setup.md, ctx-work.md skills) |
+| `.claude/commands/` | [D] Claude Code slash commands (ctx-setup.md, ctx-work.md, ctx-refresh.md skills) |
 | `.claude/hooks/` | Claude Code hooks (preflight, post-commit, session-sync, landmine-guard, ripple-check) |
 | `.changeset/` | Changesets config for version management |
 
@@ -42,6 +42,8 @@
 - `src/templates/skill.ts` → `src/commands/skill.ts`, `src/templates/index.ts` [D]
 - `src/utils/claude-hooks.ts` → `src/commands/init.ts`
 - `src/utils/cursor-hooks.ts` → `src/commands/init.ts`
+- `src/core/audit.ts` → `src/utils/autocompile.ts`, `src/core/preflight.ts`, `src/commands/audit.ts`, `src/commands/status.ts`, `src/mcp/tools.ts`, `src/index.ts`
+- `src/utils/git.ts` → `src/core/audit.ts`, `src/core/preflight.ts`
 
 ## Dependency flow
 <!-- [D] Derived from imports and architecture -->

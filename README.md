@@ -42,11 +42,39 @@ dotctx serve
 
 ## Workflow
 
-The typical development loop with dotctx:
+### Zero-ceremony (recommended)
 
-1. **Initialize** — `dotctx init --scan` creates the `.ctx/` directory, installs skills and editor hooks
-2. **Populate** — Run `/ctx-setup` in Claude Code (or edit `.ctx/` files manually) to fill in your project context
-3. **Code** — Use `/ctx-work <task>` for context-aware development with automatic triage, planning, and verification
+After setup, dotctx works automatically — no slash commands needed for normal development:
+
+```bash
+dotctx init --scan    # one-time setup: creates .ctx/, installs hooks and skills
+```
+
+From here, everything is automatic:
+- **Every prompt** — the preflight hook injects relevant landmines, decisions, and ripple effects as context (uses `--brief` mode for question-like prompts to reduce noise)
+- **Every file edit** — landmine guard warns before touching flagged files; ripple check shows downstream effects
+- **Every commit** — session state is auto-synced and adapters recompiled
+- **Session end** — current.yaml is updated automatically
+
+To verify your setup is correct: `dotctx doctor`
+
+The compiled output (CLAUDE.md, .cursorrules, etc.) includes a **Development Workflow** section that tells the AI how to work with your project's context — respecting conventions, verifying changes, and recording decisions. No manual invocation required.
+
+### With skills (optional ceremony)
+
+For more structured workflows, three Claude Code slash commands are available:
+
+1. **`/ctx-setup`** — Deep codebase scan to populate `.ctx/` files (run once, or when major changes happen)
+2. **`/ctx-work <task>`** — Full 6-stage workflow with tiered triage, planning, and verification
+3. **`/ctx-refresh`** — Guided review of stale context flagged by `dotctx audit`
+
+These are power-user tools for when you want explicit ceremony. Normal development doesn't require them.
+
+### The development loop
+
+1. **Initialize** — `dotctx init --scan` creates `.ctx/`, installs skills and editor hooks
+2. **Populate** — Run `/ctx-setup` (or edit `.ctx/` files manually) to fill in your project context
+3. **Code** — Just code normally; hooks inject context automatically. Use `/ctx-work <task>` for detailed ceremony
 4. **Iterate** — Mutation commands (`decide`, `landmine`, `vocab`, `loop add`, `push`) auto-compile after each change
 5. **Maintain** — `dotctx audit` flags stale context; `/ctx-refresh` guides updates
 6. **Handoff** — `dotctx push --auto` records session state from git for the next session
@@ -74,15 +102,15 @@ Auto-compile keeps your context files in sync — no need to run `dotctx compile
 
 ## Skills
 
-`dotctx init` installs three Claude Code slash commands in `.claude/commands/`:
+`dotctx init` installs three Claude Code slash commands in `.claude/commands/`. These are **optional** — the compiled output and hooks handle most workflows automatically. Skills are for when you want explicit ceremony.
 
 ### `/ctx-setup` — Deep codebase scan
 
 Scans your codebase and auto-populates all `.ctx/` files. Tags every AI-inferred value with `[D]` so you know what to verify. Works as a Claude Code slash command or can be copy-pasted into ChatGPT, Cursor, or Copilot Chat.
 
-### `/ctx-work` — Context-aware development workflow
+### `/ctx-work <task>` — Detailed development workflow (optional)
 
-A structured, 6-stage workflow for any development task:
+A structured, 6-stage workflow for complex development tasks. Use this when you want more ceremony than the automatic workflow posture provides:
 
 1. **Triage** — Runs `dotctx preflight`, classifies task as quick/standard/deep based on landmines, ripple effects, and decisions
 2. **Scope** — Progressive context gathering proportional to complexity
@@ -92,6 +120,8 @@ A structured, 6-stage workflow for any development task:
 6. **Close** — Tiered: quick = nothing, standard = `push --sync`, deep = record decisions + resolve loops + compile
 
 Usage: `/ctx-work fix the authentication bug in login flow`
+
+**Note:** For most tasks, the automatic workflow posture baked into the compiled output (CLAUDE.md, .cursorrules) is sufficient. Use `/ctx-work` for complex, multi-file changes where explicit tiering and verification steps are valuable.
 
 ### `/ctx-refresh` — Guided context refresh
 
@@ -185,7 +215,7 @@ Add to your MCP client config (e.g. Claude Desktop `claude_desktop_config.json`)
 | `dotctx init [--scan] [--force]` | Initialize `.ctx/` directory, install skills and hooks |
 | `dotctx compile --target <tool\|all>` | Compile context for an AI tool |
 | `dotctx pull --task "..."` | Generate a task-specific capsule |
-| `dotctx preflight --task "..."` | Pre-coding checklist |
+| `dotctx preflight --task "..." [--brief]` | Pre-coding checklist (`--brief` for landmines + health only) |
 | `dotctx check <file>` | Check a file for landmines and ripple effects |
 | `dotctx push [--auto] [--sync]` | Record a session handoff note (`--sync` for lightweight current.yaml update) |
 | `dotctx decide <decision> [--over ...] [--why ...]` | Record a decision |
@@ -201,6 +231,7 @@ Add to your MCP client config (e.g. Claude Desktop `claude_desktop_config.json`)
 | `dotctx skill install` | Install/update Claude Code skills |
 | `dotctx upgrade [--git-hooks] [--dry-run]` | Upgrade hooks, skills, and .ctxrc without touching .ctx/ content |
 | `dotctx audit [--json]` | Audit context freshness — stale files, drifted entries, ripple gaps |
+| `dotctx doctor` | Check dotctx setup — hooks, skills, adapters, freshness |
 | `dotctx serve` | Start MCP server |
 
 All mutation commands support `--no-compile` to skip auto-compilation.

@@ -17,7 +17,16 @@ function matches(text: string, keywords: string[]): boolean {
   return keywords.some(kw => lower.includes(kw));
 }
 
-export function generatePreflight(ctx: CtxData, task: string, ctxDir?: string): PreflightChecklist {
+export interface PreflightOptions {
+  brief?: boolean;
+  ctxDir?: string;
+}
+
+export function generatePreflight(ctx: CtxData, task: string, ctxDirOrOpts?: string | PreflightOptions): PreflightChecklist {
+  const opts: PreflightOptions = typeof ctxDirOrOpts === 'string'
+    ? { ctxDir: ctxDirOrOpts }
+    : ctxDirOrOpts || {};
+  const { brief = false, ctxDir } = opts;
   const keywords = extractKeywords(task);
 
   // Find relevant landmines
@@ -100,7 +109,7 @@ export function generatePreflight(ctx: CtxData, task: string, ctxDir?: string): 
     healthWarnings.push(...staleWarnings);
   }
 
-  // Format output
+  // Format output — brief mode only shows health + landmines
   const lines: string[] = [];
   lines.push(`# Preflight Checklist: ${task}`);
   lines.push('');
@@ -122,29 +131,31 @@ export function generatePreflight(ctx: CtxData, task: string, ctxDir?: string): 
     lines.push('');
   }
 
-  if (decisions.length) {
-    lines.push('## Constraining Decisions');
-    for (const d of decisions) {
-      lines.push(`  - ${d.decision}${d.rejected ? ` (rejected: ${d.rejected})` : ''} — ${d.why}`);
+  if (!brief) {
+    if (decisions.length) {
+      lines.push('## Constraining Decisions');
+      for (const d of decisions) {
+        lines.push(`  - ${d.decision}${d.rejected ? ` (rejected: ${d.rejected})` : ''} — ${d.why}`);
+      }
+      lines.push('');
     }
-    lines.push('');
-  }
 
-  if (rippleMap.length) {
-    lines.push('## Ripple Map');
-    lines.push('> Changes here may affect:');
-    for (const r of rippleMap) {
-      lines.push(`  - ${r}`);
+    if (rippleMap.length) {
+      lines.push('## Ripple Map');
+      lines.push('> Changes here may affect:');
+      for (const r of rippleMap) {
+        lines.push(`  - ${r}`);
+      }
+      lines.push('');
     }
-    lines.push('');
-  }
 
-  if (openLoops.length) {
-    lines.push('## Related Open Loops');
-    for (const l of openLoops) {
-      lines.push(`  - ${l.description}${l.context ? ` (${l.context})` : ''}`);
+    if (openLoops.length) {
+      lines.push('## Related Open Loops');
+      for (const l of openLoops) {
+        lines.push(`  - ${l.description}${l.context ? ` (${l.context})` : ''}`);
+      }
+      lines.push('');
     }
-    lines.push('');
   }
 
   if (!landmines.length && !decisions.length && !rippleMap.length && !openLoops.length) {

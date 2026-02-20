@@ -9,6 +9,7 @@ export function registerPreflight(program: Command): void {
     .command('preflight')
     .description('Pre-coding checklist — landmines, decisions, ripple map')
     .requiredOption('--task <description>', 'Task description')
+    .option('--brief', 'Brief mode — only show landmines and health warnings')
     .action((opts) => {
       const ctxDir = findCtxDir();
       if (!ctxDir) {
@@ -17,7 +18,7 @@ export function registerPreflight(program: Command): void {
       }
 
       const ctx = loadContext(ctxDir);
-      const checklist = generatePreflight(ctx, opts.task, ctxDir);
+      const checklist = generatePreflight(ctx, opts.task, { ctxDir, brief: opts.brief });
       console.log(checklist.formatted);
     });
 }

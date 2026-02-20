@@ -14,6 +14,20 @@ To record a decision: \`dotctx decide "choice" --over "alternatives" --why "reas
 To mark intentional weirdness: \`dotctx landmine "description" --file path:line\`
 
 Always check landmines before modifying code that looks wrong — it may be intentional.
+
+## Development Workflow
+
+Follow this posture automatically for every coding task — no need to invoke \`/ctx-work\` unless you want full ceremony:
+
+1. **Read preflight output** (auto-injected each prompt) — respect all landmines and constraining decisions shown
+2. **Conventions are hard constraints** — anti-patterns and AI failure modes listed above are things you MUST avoid, not suggestions
+3. **Plan before multi-file changes** — if your changes affect 3+ files, state your approach before implementing
+4. **Landmines are sacred** — if preflight warns about a file, or code looks wrong, check landmines before "fixing" it
+5. **Verify after implementation** — run the project's test suite and type-checker before considering work done
+6. **Record what you learned** — new architectural choices: \`dotctx decide\`; intentional oddities: \`dotctx landmine\`
+7. **Stale context warnings are informational** — note them but don't block work; suggest \`/ctx-refresh\` if relevant
+
+For detailed 6-stage workflow with tiered verification: \`/ctx-work <task>\`
 `.trim();
 
 export function compileForClaude(ctx: CtxData, budget?: number): string {

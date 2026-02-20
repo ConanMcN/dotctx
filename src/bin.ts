@@ -18,6 +18,7 @@ import { registerHooks } from './commands/hooks.js';
 import { registerUpgrade } from './commands/upgrade.js';
 import { registerCheck } from './commands/check.js';
 import { registerAudit } from './commands/audit.js';
+import { registerDoctor } from './commands/doctor.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json');
@@ -46,5 +47,6 @@ registerHooks(program);
 registerUpgrade(program);
 registerCheck(program);
 registerAudit(program);
+registerDoctor(program);
 
 program.parse();

@@ -51,12 +51,14 @@ export function createTools(ctxDir: string): ToolDefinition[] {
         type: 'object',
         properties: {
           task: { type: 'string', description: 'Description of the task you are about to work on' },
+          brief: { type: 'string', description: 'Set to "true" for brief mode — only landmines and health warnings (less noise for questions)' },
         },
         required: ['task'],
       },
       handler: async (args) => {
         const ctx = loadContext(ctxDir);
-        const checklist = generatePreflight(ctx, args.task as string, ctxDir);
+        const brief = args.brief === 'true' || args.brief === true;
+        const checklist = generatePreflight(ctx, args.task as string, { ctxDir, brief });
         return textResult(checklist.formatted);
       },
     },
